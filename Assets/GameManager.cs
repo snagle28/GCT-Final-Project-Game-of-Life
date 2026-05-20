@@ -10,14 +10,17 @@ public class GameOfLifeManager : MonoBehaviour
     // Tile references for different cell states
     [Header("Sprites/ Images for Cell States")]
     [SerializeField] private TileBase noNeighborssTile;
-    [SerializeField] private TileBase alive2NeighborsTile; // Green
-    [SerializeField] private TileBase alive3NeighborsTile; // Blue
-    [SerializeField] private TileBase alive4NeighborsTile; // New
-    [SerializeField] private TileBase aliveOtherTile;      // Red
-    
+    [SerializeField] private TileBase alive2NeighborsTile; // Green → C chord
+    [SerializeField] private TileBase alive3NeighborsTile; // Blue  → F chord
+    [SerializeField] private TileBase aliveOtherTile;      // Red   → G chord (covers 4+ neighbors too)
+
     // Grid settings
     [SerializeField] private int gridSize = 50;
     [SerializeField] private float baseUpdateInterval = 0.1f;
+
+    // Sonification hook — optional; if unassigned the simulation runs silent
+    [Header("Sonification")]
+    [SerializeField] private Sonifier sonifier;
     
     // Game state
     private int[] cells;           // 0 = dead, 1 = alive
@@ -144,6 +147,8 @@ public class GameOfLifeManager : MonoBehaviour
         
         cells = next;
         UpdateTilemap();
+
+        if (sonifier != null) sonifier.OnTick();
     }
     
     int Pos(int i, int j)
@@ -347,8 +352,6 @@ public class GameOfLifeManager : MonoBehaviour
             tile = alive2NeighborsTile;
         else if (neighbors == 3)
             tile = alive3NeighborsTile;
-        else if (neighbors == 4)
-            tile = alive4NeighborsTile;
         else
             tile = aliveOtherTile;
 
@@ -366,4 +369,17 @@ public class GameOfLifeManager : MonoBehaviour
     public bool IsPaused => isPaused;
     public int SpeedLevel => speedLevel;
     public int AliveCount => CountAlive();
+
+    // Sonification accessors. Chord index convention: 0 = C, 1 = F, 2 = G.
+    // Mirrors the tile classification in UpdateCellTile so audio voice == visual color.
+    public int GridSize => gridSize;
+
+    public int GetChordIndex(int i, int j)
+    {
+        if (cells[Pos(i, j)] == 0) return -1;
+        int n = CountAliveNeighbors(i, j);
+        if (n == 2) return 0;
+        if (n == 3) return 1;
+        return 2;
+    }
 }
