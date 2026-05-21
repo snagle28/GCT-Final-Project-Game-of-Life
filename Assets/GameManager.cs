@@ -13,7 +13,7 @@ public class GameOfLifeManager : MonoBehaviour
     [SerializeField] private TileBase alive2NeighborsTile; // Green → C chord
     [SerializeField] private TileBase alive3NeighborsTile; // Blue  → F chord
     [SerializeField] private TileBase aliveOtherTile;      // Red   → G chord (covers 4+ neighbors too)
-
+    //ㅅㄷㄴ셔ㅠㅎtesting github
     // Grid settings
     [SerializeField] private int gridSize = 50;
     [SerializeField] private float baseUpdateInterval = 0.1f;
