@@ -502,10 +502,10 @@ MonoBehaviour:
   noNeighborssTile: {fileID: 11400000, guid: f005eb617b4fd454e9e36c67dcc7e2e7, type: 2}
   alive2NeighborsTile: {fileID: 11400000, guid: 8e2bb48ef2ce2a3408a5871436cc0669, type: 2}
   alive3NeighborsTile: {fileID: 11400000, guid: 9955019b39c0fac42a3a4c4130e49ccf, type: 2}
-  alive4NeighborsTile: {fileID: 11400000, guid: 7b2a95a09f339724b9d5e17bf5100c9e, type: 2}
   aliveOtherTile: {fileID: 11400000, guid: db8926a20b743c84985487208a06bfa2, type: 2}
   gridSize: 20
   baseUpdateInterval: 0.1
+  sonifier: {fileID: 0}
 --- !u!4 &856961504
 Transform:
   m_ObjectHideFlags: 0
