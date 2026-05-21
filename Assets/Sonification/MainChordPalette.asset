@@ -12,4 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be1dcda1219f24f24a4ec2f0fee80bbd, type: 3}
   m_Name: MainChordPalette
   m_EditorClassIdentifier: Assembly-CSharp::ChordPalette
-  chords: []
+  chords:
+  - label: C major
+    notes:
+    - {fileID: 8300000, guid: a3fa7c5c684b34d969487785f4bf8b0c, type: 3}
+    - {fileID: 8300000, guid: 085af8076f6d1488bb1e2352f8f210e2, type: 3}
+    - {fileID: 8300000, guid: a4492f48671154033b9dc82a3ace539e, type: 3}
+  - label: F major
+    notes:
+    - {fileID: 8300000, guid: 57b9594cc83884d3b87cfcaaa1ddf4ee, type: 3}
+    - {fileID: 8300000, guid: 0b360db2801d34bb5bc54c15ea6bfe6b, type: 3}
+    - {fileID: 8300000, guid: 1ba88184e069240eebca59bba1b4a61e, type: 3}
+  - label: G major
+    notes:
+    - {fileID: 8300000, guid: 890337d17a7ce4ad6a9c935bf60fb1c1, type: 3}
+    - {fileID: 8300000, guid: 04d7f7b7d52934745894e2f927ae1eff, type: 3}
+    - {fileID: 8300000, guid: 550d10827ef51416292842e8bc274787, type: 3}
