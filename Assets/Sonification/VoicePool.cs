@@ -39,16 +39,22 @@ public class VoicePool : MonoBehaviour
                 src.clip = palette.GetClip(c, n);
                 src.playOnAwake = false;
                 src.loop = false;
+                src.spatialBlend = 0f;
+                src.panStereo = 0f;
+
                 sources[c, n] = src;
             }
         }
     }
 
-    public void Trigger(int chordIndex, int noteIndex, float volume)
+    public void Trigger(int chordIndex, int noteIndex, float volume, float pan = 0f)
     {
         if (sources == null) return;
+
         var src = sources[chordIndex, noteIndex];
         if (src == null || src.clip == null) return;
+
+        src.panStereo = Mathf.Clamp(pan, -1f, 1f);
         src.PlayOneShot(src.clip, volume);
     }
 }
