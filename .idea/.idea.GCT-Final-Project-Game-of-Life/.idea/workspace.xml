@@ -12,11 +12,8 @@
   <component name="ChangeListManager">
     <list default="true" id="b70a6109-2efc-4fd5-bd74-8922a494dc3f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GCT-Final-Project-Game-of-Life/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GCT-Final-Project-Game-of-Life/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sonification 2.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sounds 2.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/packages-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/packages-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/SceneManagement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/SceneManagement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Intro Sound.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Intro Sound.unity" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,7 +21,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="4" />
+    <option name="cachedIndexableFilesCount" value="7" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
@@ -114,7 +111,7 @@
       <workItem from="1779085993241" duration="1333000" />
       <workItem from="1779157883633" duration="855000" />
       <workItem from="1779334667942" duration="514000" />
-      <workItem from="1779868757837" duration="3334000" />
+      <workItem from="1779868757837" duration="4277000" />
     </task>
     <servers />
   </component>

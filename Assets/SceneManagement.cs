@@ -43,5 +43,10 @@ public class SceneManagement : MonoBehaviour
        loadNextScene = true;
        print("next scene");
     }
+
+    public void playClickSound()
+    {
+        print("play click sound");
+    }
     
 }
