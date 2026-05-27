@@ -128,6 +128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 78929064}
+  - component: {fileID: 78929065}
   m_Layer: 5
   m_Name: Palette
   m_TagString: Untagged
@@ -156,6 +157,31 @@ RectTransform:
   m_AnchoredPosition: {x: -34.374996, y: 22.500008}
   m_SizeDelta: {x: 171.6, y: 81.600006}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &78929065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 78929063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 660cac4fa24ce483995369f486788f74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ColorPalette
+  colors:
+  - label: Blue
+    tile: {fileID: 11400000, guid: db8926a20b743c84985487208a06bfa2, type: 2}
+    button: {fileID: 1230106920}
+  - label: Yellow
+    tile: {fileID: 11400000, guid: 8e2bb48ef2ce2a3408a5871436cc0669, type: 2}
+    button: {fileID: 572505553}
+  - label: Beige
+    tile: {fileID: 11400000, guid: 9955019b39c0fac42a3a4c4130e49ccf, type: 2}
+    button: {fileID: 323119556}
+  uiCamera: {fileID: 0}
+  selectedScale: 1.2
+  defaultIndex: 0
 --- !u!1 &79182219
 GameObject:
   m_ObjectHideFlags: 0
@@ -1331,6 +1357,7 @@ MonoBehaviour:
   gridSize: 20
   baseUpdateInterval: 0.1
   sonifier: {fileID: 513866404}
+  palette: {fileID: 78929065}
 --- !u!4 &856961504
 Transform:
   m_ObjectHideFlags: 0

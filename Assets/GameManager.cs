@@ -21,6 +21,11 @@ public class GameOfLifeManager : MonoBehaviour
     // Sonification hook — optional; if unassigned the simulation runs silent
     [Header("Sonification")]
     [SerializeField] private Sonifier sonifier;
+
+    // Paint color picker — optional; if unassigned, drawing falls back to
+    // coloring cells by neighbor count (the original behavior).
+    [Header("Drawing")]
+    [SerializeField] private ColorPalette palette;
     
     // Game state
     private int[] cells;           // 0 = dead, 1 = alive
@@ -306,24 +311,26 @@ public class GameOfLifeManager : MonoBehaviour
     
     void HandleMouseInput()
     {
+        // Don't paint the grid when the click lands on a palette button.
+        if (palette != null && palette.IsPointerOverPalette()) return;
+
         if (Input.GetMouseButton(0)) // Mouse button held down
         {
             Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3Int gridPos = tilemap.WorldToCell(mouseWorldPos);
-            
+
             if (gridPos.x >= 0 && gridPos.x < gridSize &&
                 gridPos.y >= 0 && gridPos.y < gridSize)
             {
-                ChangeCell(gridPos.x, gridPos.y, 1);
-                UpdateCellTile(gridPos.x, gridPos.y);
+                PaintCell(gridPos.x, gridPos.y);
             }
         }
-        
+
         if (Input.GetMouseButtonDown(0)) // Mouse button just clicked
         {
             Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3Int gridPos = tilemap.WorldToCell(mouseWorldPos);
-            
+
             if (gridPos.x >= 0 && gridPos.x < gridSize &&
                 gridPos.y >= 0 && gridPos.y < gridSize)
             {
@@ -335,11 +342,23 @@ public class GameOfLifeManager : MonoBehaviour
                 }
                 else
                 {
-                    ChangeCell(gridPos.x, gridPos.y, 1);
-                    UpdateCellTile(gridPos.x, gridPos.y);
+                    PaintCell(gridPos.x, gridPos.y);
                 }
             }
         }
+    }
+
+    // Sets a cell alive and paints it with the palette's selected tile.
+    // Falls back to neighbor-count coloring when no palette/color is selected.
+    void PaintCell(int i, int j)
+    {
+        ChangeCell(i, j, 1);
+
+        TileBase tile = (palette != null) ? palette.SelectedTile : null;
+        if (tile != null)
+            tilemap.SetTile(new Vector3Int(i, j, 0), tile);
+        else
+            UpdateCellTile(i, j);
     }
 
     void UpdateCellTile(int i, int j)
