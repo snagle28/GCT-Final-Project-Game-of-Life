@@ -10,20 +10,14 @@
     <configurations />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b70a6109-2efc-4fd5-bd74-8922a494dc3f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.GCT-Final-Project-Game-of-Life/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GCT-Final-Project-Game-of-Life/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sonification/GridAggregator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Sonification/GridAggregator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sonification/SonificationConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Sonification/SonificationConfig.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sonification/Sonifier.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Sonification/Sonifier.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sonification/VoicePool.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Sonification/VoicePool.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b70a6109-2efc-4fd5-bd74-8922a494dc3f" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="3" />
+    <option name="cachedIndexableFilesCount" value="4" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
