@@ -11,9 +11,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b70a6109-2efc-4fd5-bd74-8922a494dc3f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.GCT-Final-Project-Game-of-Life/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GCT-Final-Project-Game-of-Life/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/SceneManagement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/SceneManagement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Intro Sound.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Intro Sound.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/BoldPixels/Assets/font/BoldPixels.ttf.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/BoldPixels/Assets/font/BoldPixels.ttf.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -111,7 +110,7 @@
       <workItem from="1779085993241" duration="1333000" />
       <workItem from="1779157883633" duration="855000" />
       <workItem from="1779334667942" duration="514000" />
-      <workItem from="1779868757837" duration="4277000" />
+      <workItem from="1779868757837" duration="4987000" />
     </task>
     <servers />
   </component>
