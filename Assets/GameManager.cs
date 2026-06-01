@@ -16,7 +16,7 @@ public class GameOfLifeManager : MonoBehaviour
     [SerializeField] private TileBase aliveOtherTile;      // Blue   → G chord (color 2)
     //ㅅㄷㄴ셔ㅠㅎtesting github
     // Grid settings
-    [SerializeField] private int gridSize = 50;
+    [SerializeField] public int gridSize = 50;
     [SerializeField] private float baseUpdateInterval = 0.1f;
 
     // Sonification hook — optional; if unassigned the simulation runs silent
@@ -29,9 +29,9 @@ public class GameOfLifeManager : MonoBehaviour
     [SerializeField] private ColorPalette palette;
 
     // Game state
-    private int[] cells;           // 0 = dead, 1 = alive
-    private int[] age;             // Track cell age
-    private int[] colorIndex;      // Per-cell stored color/chord: 0=Yellow/C, 1=Beige/F, 2=Blue/G
+    [System.NonSerialized] public int[] cells;
+    [System.NonSerialized] public int[] age;
+    [System.NonSerialized] public int[] colorIndex;    // Per-cell stored color/chord: 0=Yellow/C, 1=Beige/F, 2=Blue/G
     private bool isPaused = true;
     private float timeSinceLastUpdate = 0f;
     private float currentUpdateInterval;
@@ -99,26 +99,9 @@ public class GameOfLifeManager : MonoBehaviour
         age = new int[gridSize * gridSize];
         colorIndex = new int[gridSize * gridSize];
     }
+    
 
-    void RandomSeedGrid(float aliveChance)
-    {
-        for (int i = 0; i < gridSize; i++)
-        {
-            for (int j = 0; j < gridSize; j++)
-            {
-                cells[Pos(i, j)] = Random.value < aliveChance ? 1 : 0;
-                age[Pos(i, j)] = cells[Pos(i, j)];
-            }
-        }
-        // Give the random seed colors based on neighbor count (one-time).
-        for (int i = 0; i < gridSize; i++)
-            for (int j = 0; j < gridSize; j++)
-                if (cells[Pos(i, j)] == 1)
-                    colorIndex[Pos(i, j)] = NeighborColorIndex(i, j);
-        UpdateTilemap();
-    }
-
-    void NextGeneration()
+    public void NextGeneration()
     {
         int[] next = new int[cells.Length];
         System.Array.Copy(cells, next, cells.Length);
@@ -170,7 +153,7 @@ public class GameOfLifeManager : MonoBehaviour
         if (sonifier != null) sonifier.OnTick();
     }
 
-    int Pos(int i, int j)
+    public int Pos(int i, int j)
     {
         // Clamp to grid bounds (not wrapping, like Processing)
         i = Mathf.Clamp(i, 0, gridSize - 1);
@@ -192,7 +175,7 @@ public class GameOfLifeManager : MonoBehaviour
         return count;
     }
 
-    void UpdateTilemap()
+    public void UpdateTilemap()
     {
         for (int i = 0; i < gridSize; i++)
         {
@@ -376,7 +359,7 @@ public class GameOfLifeManager : MonoBehaviour
         tilemap.SetTile(new Vector3Int(i, j, 0), TileForColor(colorIndex[p]));
     }
 
-    void UpdateCellTile(int i, int j)
+    public void UpdateCellTile(int i, int j)
     {
         Vector3Int position = new Vector3Int(i, j, 0);
         tilemap.SetTile(position, TileForColor(colorIndex[Pos(i, j)]));
@@ -401,11 +384,12 @@ public class GameOfLifeManager : MonoBehaviour
     }
 
     // Maps a stored color index to its tile (visual + chord color).
-    TileBase TileForColor(int c)
+    public TileBase TileForColor(int c)
     {
-        if (c == 0) return alive2NeighborsTile;  // Yellow / C
-        if (c == 1) return alive3NeighborsTile;  // Beige  / F
-        return aliveOtherTile;                    // Blue   / G
+        if (c == 0) { Debug.Log("Returning yellow tile: " + alive2NeighborsTile?.name); return alive2NeighborsTile; }
+        if (c == 1) { Debug.Log("Returning beige tile: " + alive3NeighborsTile?.name); return alive3NeighborsTile; }
+        Debug.Log("Returning blue tile: " + aliveOtherTile?.name);
+        return aliveOtherTile;
     }
 
     // Maps a palette tile back to a color index. Unknown tiles default to 0.

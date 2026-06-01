@@ -11,8 +11,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b70a6109-2efc-4fd5-bd74-8922a494dc3f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/BoldPixels/Assets/font/BoldPixels.ttf.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/BoldPixels/Assets/font/BoldPixels.ttf.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.GCT-Final-Project-Game-of-Life/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GCT-Final-Project-Game-of-Life/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/GameManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/GameManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Sonification/MainChordPalette 2.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Sonification/MainChordPalette 2.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/TIle Assets/BeigeTileSprite.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TIle Assets/BeigeTileSprite.png.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/TIle Assets/BlueTileSprite.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TIle Assets/BlueTileSprite.png.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/TIle Assets/WhiteTile.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TIle Assets/WhiteTile.png.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/TIle Assets/YellowTileSprite.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TIle Assets/YellowTileSprite.png.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/packages-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/packages-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectVersion.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectVersion.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,7 +29,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="7" />
+    <option name="cachedIndexableFilesCount" value="12" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
@@ -111,6 +120,8 @@
       <workItem from="1779157883633" duration="855000" />
       <workItem from="1779334667942" duration="514000" />
       <workItem from="1779868757837" duration="4987000" />
+      <workItem from="1779964607594" duration="1267000" />
+      <workItem from="1780117314059" duration="12507000" />
     </task>
     <servers />
   </component>

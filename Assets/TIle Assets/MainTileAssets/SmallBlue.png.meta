@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 81563c10940a1d145a4397340d71c385
+guid: 8a307bbc796d04642a40dfb551f04ba5
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8774579561408971138
-    second: WhiteTile_0
+      213: 4738233168461291953
+    second: BlueTileSprite_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 10
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -126,7 +126,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: WhiteTile_0
+      name: BlueTileSprite_0
       rect:
         serializedVersion: 2
         x: 0
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e7eb0dce06e6a3680800000000000000
-      internalID: -8774579561408971138
+      spriteID: 1b1eb1566f591c140800000000000000
+      internalID: 4738233168461291953
       vertices: []
       indices: 
       edges: []
@@ -151,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      WhiteTile_0: -8774579561408971138
+      BlueTileSprite_0: 4738233168461291953
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
