@@ -6,10 +6,16 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Beginning Cutscene.unity
+    guid: e49ece57f0e2f904e91151f2530e973c
+  - enabled: 1
     path: Assets/Scenes/Intro Sound.unity
     guid: 0ad742a742c66184789c5a6a2c6b0836
   - enabled: 1
-    path: Assets/Scenes/Main Scene.unity
+    path: Assets/Scenes/Soundscape1.unity
+    guid: 1f6f7539ea848f244a2f3ce3873221ee
+  - enabled: 1
+    path: Assets/Scenes/Soundscape2.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
