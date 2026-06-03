@@ -34,11 +34,8 @@ public class GameOfLifeManager : MonoBehaviour
     [System.NonSerialized] public int[] colorIndex;    // Per-cell stored color/chord: 0=Yellow/C, 1=Beige/F, 2=Blue/G
     private bool isPaused = true;
     private float timeSinceLastUpdate = 0f;
-    private float currentUpdateInterval;
-
-    // Speed control (like frame rate in Processing)
-    private int speedLevel = 30;   // 1-60, higher = slower
-
+    private float currentUpdateInterval = 1f;
+    
     // Pattern definitions (matching Processing patterns)
     private int[][] glider = {
         new int[] {0,1,0},
@@ -70,7 +67,6 @@ public class GameOfLifeManager : MonoBehaviour
     {
         InitializeGrid();
         //RandomSeedGrid(0.5f); // 50% chance like Processing
-        currentUpdateInterval = baseUpdateInterval * speedLevel / 30f;
     }
 
     void Update()
@@ -257,24 +253,6 @@ public class GameOfLifeManager : MonoBehaviour
             Debug.Log("Paused: " + isPaused);
         }
 
-        // W to speed up (lower speedLevel)
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            speedLevel--;
-            speedLevel = Mathf.Clamp(speedLevel, 1, 60);
-            currentUpdateInterval = baseUpdateInterval * speedLevel / 30f;
-            Debug.Log("Speed level: " + speedLevel);
-        }
-
-        // S to slow down (higher speedLevel)
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            speedLevel++;
-            speedLevel = Mathf.Clamp(speedLevel, 1, 60);
-            currentUpdateInterval = baseUpdateInterval * speedLevel / 30f;
-            Debug.Log("Speed level: " + speedLevel);
-        }
-
         // C to clear
         if (Input.GetKeyDown(KeyCode.C))
         {
@@ -437,7 +415,6 @@ public class GameOfLifeManager : MonoBehaviour
 
     // Getters for UI display
     public bool IsPaused => isPaused;
-    public int SpeedLevel => speedLevel;
     public int AliveCount => CountAlive();
 
     // Sonification accessors. Chord index convention: 0 = C, 1 = F, 2 = G.
@@ -449,5 +426,15 @@ public class GameOfLifeManager : MonoBehaviour
         int p = Pos(i, j);
         if (cells[p] == 0) return -1;
         return colorIndex[p];
+    }
+    
+    // Slider value: 0 = slowest (~1/sec), 1 = fastest (~30/sec)
+    public void SetSpeedFromSlider(float t)
+    {
+        // Exponential curve: gives perceptually even spacing across the range
+        // t=0 → interval=1.0s, t=1 → interval=0.033s (~30/sec)
+        float minInterval = 1f / 30f;
+        float maxInterval = 1f;
+        currentUpdateInterval = Mathf.Lerp(maxInterval, minInterval, Mathf.Sqrt(t));
     }
 }
