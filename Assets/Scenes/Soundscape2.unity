@@ -742,7 +742,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 231.00003, y: -248.00003}
+  m_AnchoredPosition: {x: 231.00006, y: -248.00003}
   m_SizeDelta: {x: 80.14, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &460066257
@@ -1583,6 +1583,17 @@ MonoBehaviour:
   gridSize: 20
   baseUpdateInterval: 0.1
   sonifier: {fileID: 513866404}
+  melody: {fileID: 0}
+  melodyVolume: 0.08
+  footstep: {fileID: 0}
+  footstepVolume: 0.3
+  startSound: {fileID: 0}
+  startSoundVolume: 0.3
+  backgroundLoop: {fileID: 0}
+  bgMinVolume: 0.02
+  bgMaxVolume: 0.95
+  bgCapFraction: 0.7
+  bgSmoothing: 0.1
   palette: {fileID: 0}
 --- !u!4 &856961504
 Transform:
@@ -2862,7 +2873,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 232.00003, y: -204.00003}
+  m_AnchoredPosition: {x: 232.00006, y: -204.00003}
   m_SizeDelta: {x: 80.14, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1430494368

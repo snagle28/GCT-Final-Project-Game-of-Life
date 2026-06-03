@@ -19,9 +19,31 @@ public class GameOfLifeManager : MonoBehaviour
     [SerializeField] public int gridSize = 50;
     [SerializeField] private float baseUpdateInterval = 0.1f;
 
-    // Sonification hook — optional; if unassigned the simulation runs silent
+    // AD1/AD2: per-generation melodic tones (color -> chord, mean Y -> pitch,
+    // mean X -> stereo pan). Auto-created in Start; clips load from Resources/Notes.
     [Header("Sonification")]
-    [SerializeField] private Sonifier sonifier;
+    [SerializeField] private MelodyPlayer melody;
+    [SerializeField, Range(0f, 1f)] private float melodyVolume = 0.6f; // AD1/AD2 note loudness
+    [SerializeField, Range(1f, 4f)] private float melodyPanStrength = 2.5f; // AD2 stereo spread (higher = more extreme)
+    [SerializeField, Range(0f, 0.5f)] private float melodyMinInterval = 0.12f; // min seconds between melody pulses (decouples from tempo)
+
+    // AD3: click effect sound played when painting a cell. Auto-created in Start
+    // if left unassigned; loads its clips for the active soundscape from Resources.
+    [SerializeField] private FootstepPlayer footstep;
+    [SerializeField, Range(0f, 1f)] private float footstepVolume = 1f; // AD3 click-sound loudness
+
+    // AD4: start/stop effect sound played on the play/pause toggle (space bar).
+    // Auto-created in Start if left unassigned; loads its clip from Resources.
+    [SerializeField] private StartSoundPlayer startSound;
+    [SerializeField, Range(0f, 1f)] private float startSoundVolume = 1f; // AD4 start/stop-sound loudness
+
+    // AD5: continuous background loop; volume driven by total alive-cell count.
+    // Auto-created in Start if left unassigned; loads its clip from Resources.
+    [SerializeField] private BackgroundLoopPlayer backgroundLoop;
+    [SerializeField, Range(0f, 1f)] private float bgMinVolume = 0.1f;   // volume at 0 cells
+    [SerializeField, Range(0f, 1f)] private float bgMaxVolume = 0.8f;   // volume once cells reach the cap
+    [SerializeField, Range(0.01f, 1f)] private float bgCapFraction = 0.3f; // cap = this fraction of all cells
+    [SerializeField, Range(0.01f, 1f)] private float bgSmoothing = 0.1f;   // per-frame volume lerp (anti-jump)
 
     // Paint color picker — optional; if unassigned, drawing falls back to
     // coloring cells by neighbor count (the original behavior).
@@ -67,6 +89,18 @@ public class GameOfLifeManager : MonoBehaviour
     {
         InitializeGrid();
         //RandomSeedGrid(0.5f); // 50% chance like Processing
+
+        // AD1/AD2: ensure the per-generation melody player exists.
+        if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
+
+        // AD3: ensure a footstep click-sound player exists (volume passed per Play).
+        if (footstep == null) footstep = gameObject.AddComponent<FootstepPlayer>();
+
+        // AD4: ensure a start/stop-sound player exists (volume passed per Play).
+        if (startSound == null) startSound = gameObject.AddComponent<StartSoundPlayer>();
+
+        // AD5: ensure the background loop player exists (it starts playing on Awake).
+        if (backgroundLoop == null) backgroundLoop = gameObject.AddComponent<BackgroundLoopPlayer>();
     }
 
     void Update()
@@ -87,6 +121,13 @@ public class GameOfLifeManager : MonoBehaviour
 
         // Handle mouse drawing
         HandleMouseInput();
+
+        // AD5: drive the background loop's volume from the total alive-cell count.
+        if (backgroundLoop != null)
+        {
+            int cap = Mathf.RoundToInt(gridSize * gridSize * bgCapFraction);
+            backgroundLoop.UpdateLevel(CountAlive(), cap, bgMinVolume, bgMaxVolume, bgSmoothing);
+        }
     }
 
     void InitializeGrid()
@@ -146,7 +187,8 @@ public class GameOfLifeManager : MonoBehaviour
         colorIndex = nextColor;
         UpdateTilemap();
 
-        if (sonifier != null) sonifier.OnTick();
+        // AD1/AD2: one note per color this generation (mean Y -> pitch, mean X -> pan).
+        if (melody != null) melody.PlayGeneration(this, melodyVolume, melodyPanStrength, melodyMinInterval);
     }
 
     public int Pos(int i, int j)
@@ -251,6 +293,9 @@ public class GameOfLifeManager : MonoBehaviour
         {
             isPaused = !isPaused;
             Debug.Log("Paused: " + isPaused);
+
+            // AD4: play the start/stop effect on every play/pause toggle.
+            if (startSound != null) startSound.Play(startSoundVolume);
         }
 
         // C to clear
@@ -331,10 +376,15 @@ public class GameOfLifeManager : MonoBehaviour
     // the simulation and drives that cell's chord (see GetChordIndex).
     void PaintCell(int i, int j)
     {
-        ChangeCell(i, j, 1);
         int p = Pos(i, j);
+        bool wasDead = cells[p] == 0;
+        ChangeCell(i, j, 1);
         colorIndex[p] = SelectedColorIndex();
         tilemap.SetTile(new Vector3Int(i, j, 0), TileForColor(colorIndex[p]));
+
+        // AD3: play a random click effect only when a cell is newly placed, so
+        // dragging across already-painted cells doesn't machine-gun the sound.
+        if (wasDead && footstep != null) footstep.Play(footstepVolume);
     }
 
     public void UpdateCellTile(int i, int j)
