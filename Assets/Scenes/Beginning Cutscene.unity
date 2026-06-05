@@ -1814,7 +1814,19 @@ MonoBehaviour:
   aliveOtherTile: {fileID: 11400000, guid: db8926a20b743c84985487208a06bfa2, type: 2}
   gridSize: 5
   baseUpdateInterval: 0.1
-  sonifier: {fileID: 452917333}
+  melody: {fileID: 0}
+  melodyVolume: 0.6
+  melodyPanStrength: 2.5
+  melodyMinInterval: 0.12
+  footstep: {fileID: 0}
+  footstepVolume: 1
+  startSound: {fileID: 0}
+  startSoundVolume: 1
+  backgroundLoop: {fileID: 0}
+  bgMinVolume: 0.1
+  bgMaxVolume: 0.8
+  bgCapFraction: 0.3
+  bgSmoothing: 0.1
   palette: {fileID: 0}
 --- !u!4 &791970131
 Transform:
@@ -2188,7 +2200,7 @@ TilemapRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 5
   m_MaskInteraction: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}

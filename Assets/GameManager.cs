@@ -57,9 +57,10 @@ public class GameOfLifeManager : MonoBehaviour
     private bool isPaused = true;
     private float timeSinceLastUpdate = 0f;
     private float currentUpdateInterval = 1f;
+    private bool isBeginningCutscene;
     
     // Pattern definitions (matching Processing patterns)
-    private int[][] glider = {
+private int[][] glider = {
         new int[] {0,1,0},
         new int[] {0,0,1},
         new int[] {1,1,1}
@@ -90,8 +91,10 @@ public class GameOfLifeManager : MonoBehaviour
         InitializeGrid();
         //RandomSeedGrid(0.5f); // 50% chance like Processing
 
+        isBeginningCutscene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Beginning Cutscene";
+
         // AD1/AD2: ensure the per-generation melody player exists.
-        if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
+if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
 
         // AD3: ensure a footstep click-sound player exists (volume passed per Play).
         if (footstep == null) footstep = gameObject.AddComponent<FootstepPlayer>();
@@ -123,10 +126,15 @@ public class GameOfLifeManager : MonoBehaviour
         HandleMouseInput();
 
         // AD5: drive the background loop's volume from the total alive-cell count.
-        if (backgroundLoop != null)
+        if (backgroundLoop != null && !isBeginningCutscene)
         {
             int cap = Mathf.RoundToInt(gridSize * gridSize * bgCapFraction);
             backgroundLoop.UpdateLevel(CountAlive(), cap, bgMinVolume, bgMaxVolume, bgSmoothing);
+        }
+        else if (backgroundLoop != null && isBeginningCutscene)
+        {
+             // Keep it silent during the cutscene
+            backgroundLoop.UpdateLevel(0, 1, 0, 0, 1);
         }
     }
 
@@ -188,7 +196,7 @@ public class GameOfLifeManager : MonoBehaviour
         UpdateTilemap();
 
         // AD1/AD2: one note per color this generation (mean Y -> pitch, mean X -> pan).
-        if (melody != null) melody.PlayGeneration(this, melodyVolume, melodyPanStrength, melodyMinInterval);
+        if (melody != null && !isBeginningCutscene) melody.PlayGeneration(this, melodyVolume, melodyPanStrength, melodyMinInterval);
     }
 
     public int Pos(int i, int j)
@@ -295,7 +303,7 @@ public class GameOfLifeManager : MonoBehaviour
             Debug.Log("Paused: " + isPaused);
 
             // AD4: play the start/stop effect on every play/pause toggle.
-            if (startSound != null) startSound.Play(startSoundVolume);
+            if (startSound != null && !isBeginningCutscene) startSound.Play(startSoundVolume);
         }
 
         // C to clear
@@ -335,10 +343,13 @@ public class GameOfLifeManager : MonoBehaviour
 
     void HandleMouseInput()
     {
-        // Don't paint the grid when the click lands on a palette button.
+        // Don't paint or erase when the click lands on a palette button.
         if (palette != null && palette.IsPointerOverPalette()) return;
 
-        if (Input.GetMouseButton(0)) // Mouse button held down
+        bool left = Input.GetMouseButton(0);
+        bool right = Input.GetMouseButton(1);
+
+        if (left || right)
         {
             Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3Int gridPos = tilemap.WorldToCell(mouseWorldPos);
@@ -346,34 +357,30 @@ public class GameOfLifeManager : MonoBehaviour
             if (gridPos.x >= 0 && gridPos.x < gridSize &&
                 gridPos.y >= 0 && gridPos.y < gridSize)
             {
-                PaintCell(gridPos.x, gridPos.y);
-            }
-        }
-
-        if (Input.GetMouseButtonDown(0)) // Mouse button just clicked
-        {
-            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3Int gridPos = tilemap.WorldToCell(mouseWorldPos);
-
-            if (gridPos.x >= 0 && gridPos.x < gridSize &&
-                gridPos.y >= 0 && gridPos.y < gridSize)
-            {
-                int index = Pos(gridPos.x, gridPos.y);
-                if (cells[index] == 1)
-                {
-                    ChangeCell(gridPos.x, gridPos.y, 0);
-                    tilemap.SetTile(gridPos, noNeighborssTile);
-                }
-                else
+                if (left)
                 {
                     PaintCell(gridPos.x, gridPos.y);
+                }
+                else if (right)
+                {
+                    EraseCell(gridPos.x, gridPos.y);
                 }
             }
         }
     }
 
+    void EraseCell(int i, int j)
+    {
+        int p = Pos(i, j);
+        if (cells[p] == 1)
+        {
+            ChangeCell(i, j, 0);
+            tilemap.SetTile(new Vector3Int(i, j, 0), noNeighborssTile);
+        }
+    }
+
     // Sets a cell alive and stores the selected paint color so it persists through
-    // the simulation and drives that cell's chord (see GetChordIndex).
+// the simulation and drives that cell's chord (see GetChordIndex).
     void PaintCell(int i, int j)
     {
         int p = Pos(i, j);
@@ -384,7 +391,7 @@ public class GameOfLifeManager : MonoBehaviour
 
         // AD3: play a random click effect only when a cell is newly placed, so
         // dragging across already-painted cells doesn't machine-gun the sound.
-        if (wasDead && footstep != null) footstep.Play(footstepVolume);
+        if (wasDead && footstep != null && !isBeginningCutscene) footstep.Play(footstepVolume);
     }
 
     public void UpdateCellTile(int i, int j)
