@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 91dcea1279e5d41c3bd2a64863a1d04d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 314143
+  packageName: GUIPack2DFree - Simple Popup System
+  packageVersion: 1.0
+  assetPath: Assets/GuiPack2DFree/Animations/Popups/Close.anim
+  uploadId: 749188

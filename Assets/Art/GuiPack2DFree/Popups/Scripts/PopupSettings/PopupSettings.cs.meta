@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 6014f7e2858fe4c0a8588343e4ddd422
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 314143
+  packageName: GUIPack2DFree - Simple Popup System
+  packageVersion: 1.0
+  assetPath: Assets/GuiPack2DFree/Popups/Scripts/PopupSettings/PopupSettings.cs
+  uploadId: 749188

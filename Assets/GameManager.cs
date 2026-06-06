@@ -85,6 +85,30 @@ private int[][] glider = {
         new int[] {1,0,1,0,0,0,1,0,1},
         new int[] {0,1,0,0,0,0,0,1,0}
     };
+    
+    private int[][] diamond = {
+        new int[] {0,0,1,1,1,0,0},
+        new int[] {0,1,1,1,1,1,0},
+        new int[] {1,1,1,1,1,1,1},
+        new int[] {0,1,1,1,1,1,0},
+        new int[] {0,0,1,1,1,0,0}
+    };
+
+    private int[][] pulsar = {
+        new int[] {0,0,1,1,1,0,0,0,1,1,1,0,0},
+        new int[] {0,0,0,0,0,0,0,0,0,0,0,0,0},
+        new int[] {1,0,0,0,0,1,0,1,0,0,0,0,1},
+        new int[] {1,0,0,0,0,1,0,1,0,0,0,0,1},
+        new int[] {1,0,0,0,0,1,0,1,0,0,0,0,1},
+        new int[] {0,0,1,1,1,0,0,0,1,1,1,0,0},
+        new int[] {0,0,0,0,0,0,0,0,0,0,0,0,0},
+        new int[] {0,0,1,1,1,0,0,0,1,1,1,0,0},
+        new int[] {1,0,0,0,0,1,0,1,0,0,0,0,1},
+        new int[] {1,0,0,0,0,1,0,1,0,0,0,0,1},
+        new int[] {1,0,0,0,0,1,0,1,0,0,0,0,1},
+        new int[] {0,0,0,0,0,0,0,0,0,0,0,0,0},
+        new int[] {0,0,1,1,1,0,0,0,1,1,1,0,0}
+    };
 
     void Start()
     {
@@ -336,8 +360,20 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
         {
             ClearGrid();
             SetPatternAtMouse(p101);
-            isPaused = true;
+            isPaused = true; //place moth
             Debug.Log("P101 placed - paused");
+        }
+        
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            SetPatternAtMouse(diamond);
+            Debug.Log("Diamond placed");
+        }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            SetPatternAtMouse(pulsar);
+            Debug.Log("Pulsar placed");
         }
     }
 

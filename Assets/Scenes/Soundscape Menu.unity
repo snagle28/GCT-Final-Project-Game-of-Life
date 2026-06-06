@@ -185,7 +185,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   myWindow: {fileID: 1237495822}
+  director: {fileID: 0}
+  buttonClicked: 0
+  fadePanel: {fileID: 0}
   loadDelay: 0.6
+  fadeDuration: 0.8
 --- !u!4 &184957150
 Transform:
   m_ObjectHideFlags: 0

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 90b4e8c6c4c6f4b729fbfbb159eab185
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 314143
+  packageName: GUIPack2DFree - Simple Popup System
+  packageVersion: 1.0
+  assetPath: Assets/GuiPack2DFree/Popups/Prefabs/PopupPrivacy/PopupPrivacy.prefab
+  uploadId: 749188

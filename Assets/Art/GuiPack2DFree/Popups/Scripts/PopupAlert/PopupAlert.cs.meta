@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 2ca4247bae157417ba128dc3a97e75fa
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 314143
+  packageName: GUIPack2DFree - Simple Popup System
+  packageVersion: 1.0
+  assetPath: Assets/GuiPack2DFree/Popups/Scripts/PopupAlert/PopupAlert.cs
+  uploadId: 749188

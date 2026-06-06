@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a65f6255d546a4153957a4a2dd0b478a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 314143
+  packageName: GUIPack2DFree - Simple Popup System
+  packageVersion: 1.0
+  assetPath: Assets/GuiPack2DFree/Fonts/Font Assets/LiberationSans SDF - white.asset
+  uploadId: 749188

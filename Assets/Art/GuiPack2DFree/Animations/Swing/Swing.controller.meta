@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 97fd0b5aee41b4d5297d1302a0517164
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 314143
+  packageName: GUIPack2DFree - Simple Popup System
+  packageVersion: 1.0
+  assetPath: Assets/GuiPack2DFree/Animations/Swing/Swing.controller
+  uploadId: 749188

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: d422eaed0917e496c835c547ce8a8609
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 314143
+  packageName: GUIPack2DFree - Simple Popup System
+  packageVersion: 1.0
+  assetPath: Assets/GuiPack2DFree/Popups/Scripts/PopupPause/PopupPause.cs
+  uploadId: 749188

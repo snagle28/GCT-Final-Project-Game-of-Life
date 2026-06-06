@@ -1582,9 +1582,10 @@ MonoBehaviour:
   aliveOtherTile: {fileID: 11400000, guid: 824dc6fbada66334084b6013511e8aac, type: 2}
   gridSize: 20
   baseUpdateInterval: 0.1
-  sonifier: {fileID: 513866404}
   melody: {fileID: 0}
   melodyVolume: 0.08
+  melodyPanStrength: 2.5
+  melodyMinInterval: 0.12
   footstep: {fileID: 0}
   footstepVolume: 0.3
   startSound: {fileID: 0}
@@ -1726,7 +1727,7 @@ MonoBehaviour:
   m_MinValue: 0.2
   m_MaxValue: 0.8
   m_WholeNumbers: 0
-  m_Value: 0.5
+  m_Value: 0.2
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:

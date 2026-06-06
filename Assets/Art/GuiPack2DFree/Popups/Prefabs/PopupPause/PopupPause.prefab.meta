@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 69c13312ee8704218a9409a3f14ef41f
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 314143
+  packageName: GUIPack2DFree - Simple Popup System
+  packageVersion: 1.0
+  assetPath: Assets/GuiPack2DFree/Popups/Prefabs/PopupPause/PopupPause.prefab
+  uploadId: 749188

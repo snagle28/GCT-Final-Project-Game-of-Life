@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: ed4b5c263948641748ce0e147ad7ed1a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 314143
+  packageName: GUIPack2DFree - Simple Popup System
+  packageVersion: 1.0
+  assetPath: Assets/GuiPack2DFree/Editor/PopupGeneratorWindow.cs
+  uploadId: 749188
