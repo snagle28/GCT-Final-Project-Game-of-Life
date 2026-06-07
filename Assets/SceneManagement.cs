@@ -20,6 +20,24 @@ public class SceneManagement : MonoBehaviour
     private bool lerpingUp;
     private bool hasJumpedToEnd = false;
 
+    // When the player uses "Back" from a Soundscape, skip the "click to begin"
+    // stage and land directly on the Environment-select screen. Setting buttonClicked
+    // replicates pressing "click to begin": the Update branch below then jumps the
+    // director to the selection state (time = 6) and plays it.
+    public static bool skipIntro = false;
+
+    void Start()
+    {
+        // Intro Sound has several SceneManagement components; only the one that owns
+        // the timeline director drives the screen state. Gate on director != null so
+        // a director-less instance doesn't consume the flag before the real one runs.
+        if (skipIntro && SceneManager.GetActiveScene().buildIndex == 1 && director != null)
+        {
+            buttonClicked = true;   // == "click to begin" already pressed
+            skipIntro = false;      // consume only when the right instance handles it
+        }
+    }
+
     void Update()
     {
         if (lerpingUp && myWindow != null)
@@ -53,6 +71,15 @@ public class SceneManagement : MonoBehaviour
     public void MoveToSoundscape2()
     {
         StartCoroutine(FadeAndLoad("Soundscape2"));
+    }
+
+    // Back button: return to the Environment-select scene ("Intro Sound", build
+    // index 1) so the player can pick a different soundscape. Reuses the same
+    // fade-to-black as the forward loads.
+    public void MoveToSelect()
+    {
+        skipIntro = true;   // land on the selection loop, not the replayed intro
+        StartCoroutine(FadeAndLoad("Intro Sound"));
     }
 
     private IEnumerator FadeAndLoad(string sceneName)

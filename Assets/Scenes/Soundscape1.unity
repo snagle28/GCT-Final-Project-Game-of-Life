@@ -979,13 +979,13 @@ MonoBehaviour:
   gridSize: 20
   baseUpdateInterval: 0.1
   melody: {fileID: 0}
-  melodyVolume: 0.08
+  melodyVolume: 0.12
   melodyPanStrength: 2.5
   melodyMinInterval: 0.12
   footstep: {fileID: 0}
-  footstepVolume: 0.3
+  footstepVolume: 0.15
   startSound: {fileID: 0}
-  startSoundVolume: 0.3
+  startSoundVolume: 0.1
   backgroundLoop: {fileID: 0}
   bgMinVolume: 0.02
   bgMaxVolume: 0.95

@@ -26,6 +26,11 @@ public class GameOfLifeManager : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float melodyVolume = 0.6f; // AD1/AD2 note loudness
     [SerializeField, Range(1f, 4f)] private float melodyPanStrength = 2.5f; // AD2 stereo spread (higher = more extreme)
     [SerializeField, Range(0f, 0.5f)] private float melodyMinInterval = 0.12f; // min seconds between melody pulses (decouples from tempo)
+    [SerializeField, Range(0.1f, 4f)] private float melodySustainSeconds = 3.5f; // "pedal" hold: how long a held note rings before fading out
+    [SerializeField, Range(0.02f, 1f)] private float melodyCrossfadeSeconds = 0.3f; // legato glide when a color's pitch changes
+    [SerializeField, Range(0f, 0.5f)] private float melodyAttackSeconds = 0.08f;  // soft fade-in that rounds off each new note's onset
+    [SerializeField, Range(0.02f, 1f)] private float melodyReleaseSeconds = 0.3f; // fade-out when a held note's pedal time ends
+    [SerializeField, Range(1, 10)] private int melodyMaxVoicesPerColor = 6;       // safety cap on overlapping notes per color
 
     // AD3: click effect sound played when painting a cell. Auto-created in Start
     // if left unassigned; loads its clips for the active soundscape from Resources.
@@ -128,6 +133,12 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
 
         // AD5: ensure the background loop player exists (it starts playing on Awake).
         if (backgroundLoop == null) backgroundLoop = gameObject.AddComponent<BackgroundLoopPlayer>();
+
+        // Back button: only in the Soundscape gameplay scenes, so the player can
+        // return to the Environment-select screen and pick a different one.
+        string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (scene == "Soundscape1" || scene == "Soundscape2")
+            gameObject.AddComponent<BackButton>();
     }
 
     void Update()
@@ -148,6 +159,10 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
 
         // Handle mouse drawing
         HandleMouseInput();
+
+        // AD1/AD2: per-frame melody envelope work (attack fade-in, pedal release).
+        if (melody != null && !isBeginningCutscene)
+            melody.UpdateVoices(melodySustainSeconds, melodyAttackSeconds, melodyReleaseSeconds);
 
         // AD5: drive the background loop's volume from the total alive-cell count.
         if (backgroundLoop != null && !isBeginningCutscene)
@@ -220,7 +235,7 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
         UpdateTilemap();
 
         // AD1/AD2: one note per color this generation (mean Y -> pitch, mean X -> pan).
-        if (melody != null && !isBeginningCutscene) melody.PlayGeneration(this, melodyVolume, melodyPanStrength, melodyMinInterval);
+        if (melody != null && !isBeginningCutscene) melody.PlayGeneration(this, melodyVolume, melodyPanStrength, melodyMinInterval, melodyMaxVoicesPerColor, melodyCrossfadeSeconds);
     }
 
     public int Pos(int i, int j)
