@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c02765c8bce4541d18ac4ffc0e4d0d87
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 314143
+  packageName: GUIPack2DFree - Simple Popup System
+  packageVersion: 1.0
+  assetPath: Assets/GuiPack2DFree/Animations/GUI/Button/Button.controller
+  uploadId: 749188

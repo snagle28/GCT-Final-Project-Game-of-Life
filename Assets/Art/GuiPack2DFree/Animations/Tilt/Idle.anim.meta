@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f847f72cc349848fb90ff967f3a94e60
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 314143
+  packageName: GUIPack2DFree - Simple Popup System
+  packageVersion: 1.0
+  assetPath: Assets/GuiPack2DFree/Animations/Tilt/Idle.anim
+  uploadId: 749188

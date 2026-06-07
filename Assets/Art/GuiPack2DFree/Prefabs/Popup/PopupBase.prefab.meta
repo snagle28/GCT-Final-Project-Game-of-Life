@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ee79851c45e214d2d89d5f626f6e6240
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 314143
+  packageName: GUIPack2DFree - Simple Popup System
+  packageVersion: 1.0
+  assetPath: Assets/GuiPack2DFree/Prefabs/Popup/PopupBase.prefab
+  uploadId: 749188
