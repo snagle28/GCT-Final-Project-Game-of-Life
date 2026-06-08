@@ -1818,6 +1818,11 @@ MonoBehaviour:
   melodyVolume: 0.6
   melodyPanStrength: 2.5
   melodyMinInterval: 0.12
+  melodySustainSeconds: 3.5
+  melodyCrossfadeSeconds: 0.3
+  melodyAttackSeconds: 0.08
+  melodyReleaseSeconds: 0.3
+  melodyMaxVoicesPerColor: 6
   footstep: {fileID: 0}
   footstepVolume: 1
   startSound: {fileID: 0}
