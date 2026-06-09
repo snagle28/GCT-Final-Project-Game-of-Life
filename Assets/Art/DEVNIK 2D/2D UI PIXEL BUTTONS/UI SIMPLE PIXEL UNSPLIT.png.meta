@@ -344,9 +344,9 @@ TextureImporter:
       name: BAR2
       rect:
         serializedVersion: 2
-        x: 1088
+        x: 1102
         y: 1116
-        width: 360
+        width: 346
         height: 124
       alignment: 0
       pivot: {x: 0.5, y: 0.5}

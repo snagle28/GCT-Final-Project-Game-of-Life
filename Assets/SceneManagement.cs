@@ -9,13 +9,13 @@ public class SceneManagement : MonoBehaviour
     public Transform myWindow;
     public PlayableDirector director;
     public bool buttonClicked = false;
-    public Image fadePanel;                  // assign the black UI Image here
+    public Image fadePanel;                  // assign the white UI Image here
 
     [Tooltip("Seconds to wait after clicking before loading the next scene.")]
     public float loadDelay = 0.6f;
 
-    [Tooltip("How long the fade-to-black takes before switching scenes.")]
-    public float fadeDuration = 0.8f;
+    [Tooltip("How long the fade takes before/after switching scenes.")]
+    public float fadeDuration = 0.4f;
 
     private bool lerpingUp;
     private bool hasJumpedToEnd = false;
@@ -28,6 +28,13 @@ public class SceneManagement : MonoBehaviour
 
     void Start()
     {
+        if (fadePanel != null) 
+        {
+            fadePanel.sprite = null;
+            fadePanel.raycastTarget = true; // Block input while fading in
+            StartCoroutine(FadeFromWhite());
+        }
+        
         // Intro Sound has several SceneManagement components; only the one that owns
         // the timeline director drives the screen state. Gate on director != null so
         // a director-less instance doesn't consume the flag before the real one runs.
@@ -36,6 +43,29 @@ public class SceneManagement : MonoBehaviour
             buttonClicked = true;   // == "click to begin" already pressed
             skipIntro = false;      // consume only when the right instance handles it
         }
+    }
+
+    private IEnumerator FadeFromWhite()
+    {
+        if (fadePanel == null) yield break;
+
+        fadePanel.sprite = null;
+        float elapsed = 0f;
+        Color c = Color.white;
+        c.a = 1f;
+        fadePanel.color = c;
+
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            c.a = 1f - Mathf.Clamp01(elapsed / fadeDuration);
+            fadePanel.color = c;
+            yield return null;
+        }
+        
+        c.a = 0f;
+        fadePanel.color = c;
+        fadePanel.raycastTarget = false;
     }
 
     void Update()
@@ -63,6 +93,8 @@ public class SceneManagement : MonoBehaviour
     }
 
     // ── Faded scene loads ──────────────────────────────────────────
+    private static string lastSoundscape = "";
+
     public void MoveToSoundscape1()
     {
         StartCoroutine(FadeAndLoad("Soundscape1"));
@@ -71,6 +103,18 @@ public class SceneManagement : MonoBehaviour
     public void MoveToSoundscape2()
     {
         StartCoroutine(FadeAndLoad("Soundscape2"));
+    }
+
+    public void MoveToInstructions()
+    {
+        lastSoundscape = SceneManager.GetActiveScene().name;
+        StartCoroutine(FadeAndLoad("Instructions"));
+    }
+
+    public void MoveToPreviousScene()
+    {
+        string target = string.IsNullOrEmpty(lastSoundscape) ? "Intro Sound" : lastSoundscape;
+        StartCoroutine(FadeAndLoad(target));
     }
 
     // Back button: return to the Environment-select scene ("Intro Sound", build
@@ -84,16 +128,18 @@ public class SceneManagement : MonoBehaviour
 
     private IEnumerator FadeAndLoad(string sceneName)
     {
-        yield return StartCoroutine(FadeToBlack());
+        if (fadePanel != null) fadePanel.raycastTarget = true;
+        yield return StartCoroutine(FadeToWhite());
         SceneManager.LoadScene(sceneName);
     }
 
-    private IEnumerator FadeToBlack()
+    private IEnumerator FadeToWhite()
     {
         if (fadePanel == null) yield break;
 
+        fadePanel.sprite = null;
         float elapsed = 0f;
-        Color c = fadePanel.color;
+        Color c = Color.white;
         c.a = 0f;
         fadePanel.color = c;
 
