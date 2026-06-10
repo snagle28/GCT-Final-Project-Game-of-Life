@@ -133,12 +133,6 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
 
         // AD5: ensure the background loop player exists (it starts playing on Awake).
         if (backgroundLoop == null) backgroundLoop = gameObject.AddComponent<BackgroundLoopPlayer>();
-
-        // Back button: only in the Soundscape gameplay scenes, so the player can
-        // return to the Environment-select screen and pick a different one.
-        string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-        if (scene == "Soundscape1" || scene == "Soundscape2")
-            gameObject.AddComponent<BackButton>();
     }
 
     void Update()
