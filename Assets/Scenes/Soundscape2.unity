@@ -1643,7 +1643,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: C
+  m_text: '?'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 499ea09bcd9c2a648b3ed966340c8a1d, type: 2}
   m_sharedMaterial: {fileID: 8156309738418114030, guid: 499ea09bcd9c2a648b3ed966340c8a1d, type: 2}
@@ -1963,7 +1963,7 @@ SpriteRenderer:
   m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: -8774579561408971138, guid: 81563c10940a1d145a4397340d71c385, type: 3}
-  m_Color: {r: 0.77647066, g: 0.9058824, b: 0.9568628, a: 1}
+  m_Color: {r: 0.18823531, g: 0.26666668, b: 0.37647063, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2817,7 +2817,7 @@ SpriteRenderer:
   m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: -8774579561408971138, guid: 81563c10940a1d145a4397340d71c385, type: 3}
-  m_Color: {r: 0.18823531, g: 0.26666668, b: 0.37647063, a: 1}
+  m_Color: {r: 0.21176472, g: 0.63529414, b: 0.69803923, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -5097,7 +5097,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: CHORDS
+  m_text: COLORS
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 499ea09bcd9c2a648b3ed966340c8a1d, type: 2}
   m_sharedMaterial: {fileID: 8156309738418114030, guid: 499ea09bcd9c2a648b3ed966340c8a1d, type: 2}
@@ -5234,7 +5234,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: F
+  m_text: '?'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 499ea09bcd9c2a648b3ed966340c8a1d, type: 2}
   m_sharedMaterial: {fileID: 8156309738418114030, guid: 499ea09bcd9c2a648b3ed966340c8a1d, type: 2}
@@ -7155,7 +7155,7 @@ SpriteRenderer:
   m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: -8774579561408971138, guid: 81563c10940a1d145a4397340d71c385, type: 3}
-  m_Color: {r: 0.21176472, g: 0.63529414, b: 0.69803923, a: 1}
+  m_Color: {r: 0.77647066, g: 0.9058824, b: 0.9568628, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -7792,7 +7792,7 @@ SpriteRenderer:
   m_SortingOrder: 1
   m_MaskInteraction: 0
   m_Sprite: {fileID: -8774579561408971138, guid: 81563c10940a1d145a4397340d71c385, type: 3}
-  m_Color: {r: 0.09481421, g: 0.14440678, b: 0.21383637, a: 1}
+  m_Color: {r: 0.15586798, g: 0.40943366, b: 0.44654083, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -7887,7 +7887,7 @@ SpriteRenderer:
   m_SortingOrder: 1
   m_MaskInteraction: 0
   m_Sprite: {fileID: -8774579561408971138, guid: 81563c10940a1d145a4397340d71c385, type: 3}
-  m_Color: {r: 0.5305565, g: 0.61015314, b: 0.6415094, a: 1}
+  m_Color: {r: 0.09481421, g: 0.14440678, b: 0.21383637, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -10059,7 +10059,7 @@ SpriteRenderer:
   m_SortingOrder: 1
   m_MaskInteraction: 0
   m_Sprite: {fileID: -8774579561408971138, guid: 81563c10940a1d145a4397340d71c385, type: 3}
-  m_Color: {r: 0.15586798, g: 0.40943366, b: 0.44654083, a: 1}
+  m_Color: {r: 0.5305565, g: 0.61015314, b: 0.6415094, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -11670,7 +11670,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: G
+  m_text: '?'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 499ea09bcd9c2a648b3ed966340c8a1d, type: 2}
   m_sharedMaterial: {fileID: 8156309738418114030, guid: 499ea09bcd9c2a648b3ed966340c8a1d, type: 2}
