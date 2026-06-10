@@ -1523,7 +1523,7 @@ MonoBehaviour:
   gridSize: 20
   baseUpdateInterval: 0.1
   melody: {fileID: 0}
-  melodyVolume: 0.12
+  melodyVolume: 0.3
   melodyPanStrength: 2.5
   melodyMinInterval: 0.12
   melodySustainSeconds: 3.5
@@ -1532,12 +1532,12 @@ MonoBehaviour:
   melodyReleaseSeconds: 0.3
   melodyMaxVoicesPerColor: 6
   footstep: {fileID: 0}
-  footstepVolume: 0.15
+  footstepVolume: 0.12
   startSound: {fileID: 0}
   startSoundVolume: 0.1
   backgroundLoop: {fileID: 0}
-  bgMinVolume: 0.02
-  bgMaxVolume: 0.95
+  bgMinVolume: 0.01
+  bgMaxVolume: 0.6
   bgCapFraction: 0.7
   bgSmoothing: 0.1
   palette: {fileID: 326920496}
@@ -5097,7 +5097,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: COLORS
+  m_text: COLOR
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 499ea09bcd9c2a648b3ed966340c8a1d, type: 2}
   m_sharedMaterial: {fileID: 8156309738418114030, guid: 499ea09bcd9c2a648b3ed966340c8a1d, type: 2}
@@ -11647,7 +11647,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 702, y: -249.99998}
+  m_AnchoredPosition: {x: 702, y: -249.99997}
   m_SizeDelta: {x: 80.14, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2012799150
