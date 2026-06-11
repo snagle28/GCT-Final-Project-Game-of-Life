@@ -19,18 +19,18 @@ public class GameOfLifeManager : MonoBehaviour
     [SerializeField] public int gridSize = 50;
     [SerializeField] private float baseUpdateInterval = 0.1f;
 
-    // AD1/AD2: per-generation melodic tones (color -> chord, mean Y -> pitch,
-    // mean X -> stereo pan). Auto-created in Start; clips load from Resources/Notes.
+    // AD1/AD2: per-generation histogram sonification (v1 algorithm). Alive cells are
+    // binned by color (chord) and by column (note = i % noteCount); each bin's CELL
+    // COUNT drives that note's loudness. mean X also pans the color. Auto-created in
+    // Start; clips load from Resources/Notes.
     [Header("Sonification")]
     [SerializeField] private MelodyPlayer melody;
-    [SerializeField, Range(0f, 1f)] private float melodyVolume = 0.6f; // AD1/AD2 note loudness
-    [SerializeField, Range(1f, 4f)] private float melodyPanStrength = 2.5f; // AD2 stereo spread (higher = more extreme)
-    [SerializeField, Range(0f, 0.5f)] private float melodyMinInterval = 0.12f; // min seconds between melody pulses (decouples from tempo)
-    [SerializeField, Range(0.1f, 4f)] private float melodySustainSeconds = 3.5f; // "pedal" hold: how long a held note rings before fading out
-    [SerializeField, Range(0.02f, 1f)] private float melodyCrossfadeSeconds = 0.3f; // legato glide when a color's pitch changes
-    [SerializeField, Range(0f, 0.5f)] private float melodyAttackSeconds = 0.08f;  // soft fade-in that rounds off each new note's onset
-    [SerializeField, Range(0.02f, 1f)] private float melodyReleaseSeconds = 0.3f; // fade-out when a held note's pedal time ends
-    [SerializeField, Range(1, 10)] private int melodyMaxVoicesPerColor = 6;       // safety cap on overlapping notes per color
+    [SerializeField, Range(0f, 1f)] private float melodyVolume = 0.6f; // AD1/AD2 master note loudness
+    [SerializeField, Range(1f, 4f)] private float melodyPanStrength = 2.5f; // AD2 stereo spread (mean column)
+    [SerializeField, Range(1, 10)] private int melodyTriggerEveryNTicks = 1;       // v1: re-trigger every N generations
+    [SerializeField, Range(1, 64)] private int melodyLoudnessSaturationCount = 8;  // v1: cell count in a bin that maps to full volume
+    [SerializeField, Range(0f, 0.5f)] private float melodyMinAudibleVolume = 0.02f; // v1: bins quieter than this are skipped
+    [SerializeField, Range(0f, 2f)] private float melodyRetriggerCooldown = 0.35f;  // seconds a note waits before re-striking (anti-pileup)
 
     // AD3: click effect sound played when painting a cell. Auto-created in Start
     // if left unassigned; loads its clips for the active soundscape from Resources.
@@ -154,10 +154,6 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
         // Handle mouse drawing
         HandleMouseInput();
 
-        // AD1/AD2: per-frame melody envelope work (attack fade-in, pedal release).
-        if (melody != null && !isBeginningCutscene)
-            melody.UpdateVoices(melodySustainSeconds, melodyAttackSeconds, melodyReleaseSeconds);
-
         // AD5: drive the background loop's volume from the total alive-cell count.
         if (backgroundLoop != null && !isBeginningCutscene)
         {
@@ -228,8 +224,8 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
         colorIndex = nextColor;
         UpdateTilemap();
 
-        // AD1/AD2: one note per color this generation (mean Y -> pitch, mean X -> pan).
-        if (melody != null && !isBeginningCutscene) melody.PlayGeneration(this, melodyVolume, melodyPanStrength, melodyMinInterval, melodyMaxVoicesPerColor, melodyCrossfadeSeconds);
+        // AD1/AD2: v1 histogram sonification (column -> note bin, cell count -> loudness).
+        if (melody != null && !isBeginningCutscene) melody.PlayGeneration(this, melodyVolume, melodyPanStrength, melodyTriggerEveryNTicks, melodyLoudnessSaturationCount, melodyMinAudibleVolume, melodyRetriggerCooldown);
     }
 
     public int Pos(int i, int j)
