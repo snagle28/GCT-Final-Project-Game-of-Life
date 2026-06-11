@@ -61,6 +61,32 @@ public class ColorPalette : MonoBehaviour
             int hit = ButtonUnderMouse();
             if (hit >= 0) SelectColor(hit);
         }
+
+        // Number-key hotkeys: 1/2/3 (top row or numpad) select the matching color.
+        HandleColorHotkeys();
+    }
+
+    // Number-key → color-index map. keyToColor[k] is the color selected when
+    // the (k+1) key is pressed. Current layout: 1→colors[1], 2→colors[2],
+    // 3→colors[0]. Edit this array to remap the hotkeys.
+    private static readonly int[] keyToColor = { 1, 2, 0 };
+
+    // Selects a color from a number-key press, ignoring keys with no valid
+    // mapping (e.g. when fewer colors exist than entries above).
+    private void HandleColorHotkeys()
+    {
+        for (int k = 0; k < keyToColor.Length; k++)
+        {
+            int colorIndex = keyToColor[k];
+            if (colorIndex < 0 || colorIndex >= colors.Length) continue;
+
+            if (Input.GetKeyDown(KeyCode.Alpha1 + k) ||
+                Input.GetKeyDown(KeyCode.Keypad1 + k))
+            {
+                SelectColor(colorIndex);
+                break;
+            }
+        }
     }
 
     // True while the cursor is over any palette sprite. GameOfLifeManager checks
