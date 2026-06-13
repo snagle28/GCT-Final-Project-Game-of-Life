@@ -1532,9 +1532,9 @@ MonoBehaviour:
   melodyReleaseSeconds: 0.3
   melodyMaxVoicesPerColor: 6
   footstep: {fileID: 0}
-  footstepVolume: 0.06
+  footstepVolume: 0.031
   startSound: {fileID: 0}
-  startSoundVolume: 0.35
+  startSoundVolume: 0
   backgroundLoop: {fileID: 0}
   bgMinVolume: 0.02
   bgMaxVolume: 0.95

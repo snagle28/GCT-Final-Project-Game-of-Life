@@ -1534,7 +1534,7 @@ MonoBehaviour:
   footstep: {fileID: 0}
   footstepVolume: 0.12
   startSound: {fileID: 0}
-  startSoundVolume: 0.1
+  startSoundVolume: 0
   backgroundLoop: {fileID: 0}
   bgMinVolume: 0.01
   bgMaxVolume: 0.6
