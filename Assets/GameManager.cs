@@ -17,8 +17,6 @@ public class GameOfLifeManager : MonoBehaviour
     //ㅅㄷㄴ셔ㅠㅎtesting github
     // Grid settings
     [SerializeField] public int gridSize = 50;
-    [SerializeField] private float baseUpdateInterval = 0.1f;
-
     // AD1/AD2: per-generation melodic tones (color -> chord, mean Y -> pitch,
     // mean X -> stereo pan). Auto-created in Start; clips load from Resources/Notes.
     [Header("Sonification")]
@@ -59,6 +57,12 @@ public class GameOfLifeManager : MonoBehaviour
     [System.NonSerialized] public int[] cells;
     [System.NonSerialized] public int[] age;
     [System.NonSerialized] public int[] colorIndex;    // Per-cell stored color/chord: 0=Yellow/C, 1=Beige/F, 2=Blue/G
+
+    // Pre-allocated buffers to reduce GC
+    private int[] nextCells;
+    private int[] nextColorIndex;
+    private TileBase[] tileArray;
+
     private bool isPaused = true;
     private float timeSinceLastUpdate = 0f;
     private float currentUpdateInterval = 1f;
@@ -176,23 +180,22 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
         cells = new int[gridSize * gridSize];
         age = new int[gridSize * gridSize];
         colorIndex = new int[gridSize * gridSize];
+        nextCells = new int[gridSize * gridSize];
+        nextColorIndex = new int[gridSize * gridSize];
+        tileArray = new TileBase[gridSize * gridSize];
     }
     
 
     public void NextGeneration()
     {
-        int[] next = new int[cells.Length];
-        System.Array.Copy(cells, next, cells.Length);
+        System.Array.Copy(cells, nextCells, cells.Length);
+        System.Array.Copy(colorIndex, nextColorIndex, colorIndex.Length);
 
-        // Copy colors forward: surviving cells keep their color; newborns get one below.
-        int[] nextColor = new int[colorIndex.Length];
-        System.Array.Copy(colorIndex, nextColor, colorIndex.Length);
-
-        for (int i = 0; i < gridSize; i++)
+        for (int j = 0; j < gridSize; j++)
         {
-            for (int j = 0; j < gridSize; j++)
+            for (int i = 0; i < gridSize; i++)
             {
-                int p = Pos(i, j);
+                int p = i + j * gridSize;
                 int neighbors = CountAliveNeighbors(i, j);
 
                 if (cells[p] == 1)
@@ -201,12 +204,12 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
                     if (neighbors < 2 || neighbors > 3)
                     {
                         // Dies from underpopulation or overpopulation
-                        next[p] = 0;
+                        nextCells[p] = 0;
                         age[p] = 0;
                     }
                     else
                     {
-                        // Survives — keeps its existing color (nextColor[p] already copied).
+                        // Survives — keeps its existing color (nextColorIndex[p] already copied).
                         age[p]++;
                     }
                 }
@@ -216,16 +219,22 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
                     if (neighbors == 3)
                     {
                         // Birth — inherit the majority color of the 3 living parents.
-                        next[p] = 1;
+                        nextCells[p] = 1;
                         age[p] = 1;
-                        nextColor[p] = InheritColorIndex(i, j);
+                        nextColorIndex[p] = InheritColorIndex(i, j);
                     }
                 }
             }
         }
 
-        cells = next;
-        colorIndex = nextColor;
+        int[] tempCells = cells;
+        cells = nextCells;
+        nextCells = tempCells;
+
+        int[] tempColors = colorIndex;
+        colorIndex = nextColorIndex;
+        nextColorIndex = tempColors;
+
         UpdateTilemap();
 
         // AD1/AD2: one note per color this generation (mean Y -> pitch, mean X -> pan).
@@ -243,12 +252,19 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
     int CountAliveNeighbors(int i, int j)
     {
         int count = 0;
-        for (int x = -1; x <= 1; x++)
+        for (int y = -1; y <= 1; y++)
         {
-            for (int y = -1; y <= 1; y++)
+            int nj = j + y;
+            if (nj < 0 || nj >= gridSize) continue;
+
+            for (int x = -1; x <= 1; x++)
             {
                 if (x == 0 && y == 0) continue;
-                count += cells[Pos(i + x, j + y)];
+                int ni = i + x;
+                if (ni >= 0 && ni < gridSize)
+                {
+                    count += cells[ni + nj * gridSize];
+                }
             }
         }
         return count;
@@ -256,32 +272,38 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
 
     public void UpdateTilemap()
     {
-        for (int i = 0; i < gridSize; i++)
+        BoundsInt bounds = new BoundsInt(0, 0, 0, gridSize, gridSize, 1);
+        for (int j = 0; j < gridSize; j++)
         {
-            for (int j = 0; j < gridSize; j++)
+            for (int i = 0; i < gridSize; i++)
             {
-                Vector3Int position = new Vector3Int(i, j, 0);
-                int index = Pos(i, j);
-
+                int index = i + j * gridSize;
                 if (cells[index] == 1)
                 {
-                    // Cell is alive - draw its stored color
-                    UpdateCellTile(i, j);
+                    tileArray[index] = TileForColor(colorIndex[index]);
                 }
                 else
                 {
-                    // Cell is dead
-                    tilemap.SetTile(position, noNeighborssTile);
+                    tileArray[index] = noNeighborssTile;
                 }
             }
         }
+        tilemap.SetTilesBlock(bounds, tileArray);
     }
 
     void ChangeCell(int i, int j, int value)
     {
-        cells[Pos(i, j)] = value;
+        int p = Pos(i, j);
         if (value == 0)
-            age[Pos(i, j)] = 0;
+        {
+            cells[p] = 0;
+            age[p] = 0;
+        }
+        else
+        {
+            if (cells[p] == 0) age[p] = 1;
+            cells[p] = 1;
+        }
     }
 
     int CountAlive()
@@ -466,9 +488,8 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
     // Maps a stored color index to its tile (visual + chord color).
     public TileBase TileForColor(int c)
     {
-        if (c == 0) { Debug.Log("Returning yellow tile: " + alive2NeighborsTile?.name); return alive2NeighborsTile; }
-        if (c == 1) { Debug.Log("Returning beige tile: " + alive3NeighborsTile?.name); return alive3NeighborsTile; }
-        Debug.Log("Returning blue tile: " + aliveOtherTile?.name);
+        if (c == 0) return alive2NeighborsTile;
+        if (c == 1) return alive3NeighborsTile;
         return aliveOtherTile;
     }
 
@@ -496,16 +517,23 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
     int InheritColorIndex(int i, int j)
     {
         int[] tally = new int[3];
-        for (int x = -1; x <= 1; x++)
+        for (int y = -1; y <= 1; y++)
         {
-            for (int y = -1; y <= 1; y++)
+            int nj = j + y;
+            if (nj < 0 || nj >= gridSize) continue;
+
+            for (int x = -1; x <= 1; x++)
             {
                 if (x == 0 && y == 0) continue;
-                int np = Pos(i + x, j + y);
-                if (cells[np] == 1)
+                int ni = i + x;
+                if (ni >= 0 && ni < gridSize)
                 {
-                    int c = colorIndex[np];
-                    if (c >= 0 && c < 3) tally[c]++;
+                    int np = ni + nj * gridSize;
+                    if (cells[np] == 1)
+                    {
+                        int c = colorIndex[np];
+                        if (c >= 0 && c < 3) tally[c]++;
+                    }
                 }
             }
         }
