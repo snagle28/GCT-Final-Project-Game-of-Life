@@ -1495,6 +1495,7 @@ GameObject:
   - component: {fileID: 266635612}
   - component: {fileID: 266635613}
   - component: {fileID: 266635615}
+  - component: {fileID: 266635616}
   m_Layer: 5
   m_Name: GameManager
   m_TagString: Untagged
@@ -1525,12 +1526,10 @@ MonoBehaviour:
   melody: {fileID: 0}
   melodyVolume: 0.3
   melodyPanStrength: 2.5
-  melodyMinInterval: 0.12
-  melodySustainSeconds: 3.5
-  melodyCrossfadeSeconds: 0.3
-  melodyAttackSeconds: 0.08
-  melodyReleaseSeconds: 0.3
-  melodyMaxVoicesPerColor: 6
+  melodyTriggerEveryNTicks: 1
+  melodyLoudnessSaturationCount: 8
+  melodyMinAudibleVolume: 0.02
+  melodyRetriggerCooldown: 0.35
   footstep: {fileID: 0}
   footstepVolume: 0.12
   startSound: {fileID: 0}
@@ -1586,6 +1585,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   fadePanel: {fileID: 0}
   fadeDuration: 0.8
+--- !u!114 &266635616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266635611}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f12d8e85c1a994dc8a44731e028252c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GridRandomizer
+  game: {fileID: 0}
+  density: 0.3
+  colorCount: 3
+  pauseAfterRandomize: 1
+  randomizeOnStart: 0
+  randomizeKey: 114
 --- !u!1 &291943950
 GameObject:
   m_ObjectHideFlags: 0

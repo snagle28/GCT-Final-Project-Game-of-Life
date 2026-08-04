@@ -387,6 +387,11 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
         // Don't paint or erase when the click lands on a palette button.
         if (palette != null && palette.IsPointerOverPalette()) return;
 
+        // Same for canvas UI (save panel, sliders, buttons). Without this a click
+        // on a button also paints the cell sitting behind it.
+        var events = UnityEngine.EventSystems.EventSystem.current;
+        if (events != null && events.IsPointerOverGameObject()) return;
+
         bool left = Input.GetMouseButton(0);
         bool right = Input.GetMouseButton(1);
 
@@ -514,6 +519,10 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
     // Getters for UI display
     public bool IsPaused => isPaused;
     public int AliveCount => CountAlive();
+
+    // Lets other scripts stop the simulation. Randomizing or loading a board
+    // pauses first, so the new state can be inspected before it evolves.
+    public void SetPaused(bool paused) => isPaused = paused;
 
     // Sonification accessors. Chord index convention: 0 = C, 1 = F, 2 = G.
     // Now driven by the cell's stored color, so audio voice == painted color.
