@@ -86,6 +86,13 @@ public class GridSaveLoad : MonoBehaviour
         if (game == null) game = Object.FindFirstObjectByType<GameOfLifeManager>();
     }
 
+    // Keeps the quick-save slot inside the range the panel actually shows, so a
+    // stray value can't write a save no row can reach.
+    void OnValidate()
+    {
+        defaultSlot = Mathf.Clamp(defaultSlot, 1, Mathf.Max(1, slotCount));
+    }
+
     void Update()
     {
         if (saveKey != KeyCode.None && Input.GetKeyDown(saveKey)) Save();

@@ -25,7 +25,6 @@ using UnityEngine.UI;
 public static class SavePanelBuilder
 {
     private const string PanelName = "SavePanel";
-    private const int SlotCount = 3;
 
     private const string ButtonSheet = "Assets/Art/2DSimpleUIPack/Examples/Graphics/ui-large-buttons-horizontal.png";
     private const string ButtonNormal = "ui-large-buttons-horizontal_40";
@@ -117,7 +116,7 @@ public static class SavePanelBuilder
         Selection.activeGameObject = panel;
         EditorGUIUtility.PingObject(panel);
 
-        Debug.Log($"Save panel built under '{canvas.name}' with {SlotCount} slots, and wired up.\n" +
+        Debug.Log($"Save panel built under '{canvas.name}' with {storage.SlotCount} slots, and wired up.\n" +
                   "It starts hidden — press Play and click SAVE / LOAD (bottom right) to open it. " +
                   "To preview it in the editor, tick the SavePanel checkbox at the top of its Inspector.\n" +
                   "Remember to save the scene (Ctrl+S).");
@@ -173,6 +172,9 @@ public static class SavePanelBuilder
 
         BuildBackground(panel);
 
+        // Clicks on the panel must not also paint the grid behind it.
+        panel.AddComponent<PointerBlocker>();
+
         var layout = panel.AddComponent<VerticalLayoutGroup>();
         layout.padding = new RectOffset(12, 12, 10, 10);
         layout.spacing = 6f;
@@ -190,7 +192,9 @@ public static class SavePanelBuilder
                                    TextAlignmentOptions.Center, 20f);
         SetLayout(title.gameObject, flexibleWidth: 1f);
 
-        for (int slot = 1; slot <= SlotCount; slot++)
+        // Driven by the component's own Slot Count so the Inspector value is not
+        // silently ignored: change it there and rebuild to get more rows.
+        for (int slot = 1; slot <= storage.SlotCount; slot++)
             BuildRow(panel.transform, storage, slot);
 
         // Close button lives inside the panel and hides the panel itself.
@@ -295,6 +299,7 @@ public static class SavePanelBuilder
         Button open = MakeButton("SaveLoadButton", canvas, "SAVE / LOAD", 14f);
         PlaceBottomRight((RectTransform)open.transform,
                          new Vector2(-(margin + CanvasButtonSize.x + gap), margin));
+        open.gameObject.AddComponent<PointerBlocker>();
 
         var toggle = open.gameObject.AddComponent<SimpleUIToggle>();
         toggle.targetObject = panel;
@@ -305,6 +310,7 @@ public static class SavePanelBuilder
         {
             Button random = MakeButton("RandomButton", canvas, "RANDOM", 14f);
             PlaceBottomRight((RectTransform)random.transform, new Vector2(-margin, margin));
+            random.gameObject.AddComponent<PointerBlocker>();
             UnityEventTools.AddVoidPersistentListener(random.onClick, randomizer.Randomize);
             Undo.RegisterCreatedObjectUndo(random.gameObject, "Build Save Panel");
         }
@@ -361,6 +367,15 @@ public static class SavePanelBuilder
 
         var button = go.AddComponent<Button>();
         button.targetGraphic = image;
+
+        // Keyboard navigation off and selection cleared on click: the Submit axis
+        // includes space, which is also play/pause, so a button left selected
+        // fires again on the next space. Navigation would likewise let D (the
+        // diamond hotkey, also the Horizontal axis) move the selection around.
+        var navigation = button.navigation;
+        navigation.mode = Navigation.Mode.None;
+        button.navigation = navigation;
+        go.AddComponent<DeselectOnClick>();
 
         if (normal != null && pressed != null)
         {

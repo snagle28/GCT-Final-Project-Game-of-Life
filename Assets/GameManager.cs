@@ -387,10 +387,11 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
         // Don't paint or erase when the click lands on a palette button.
         if (palette != null && palette.IsPointerOverPalette()) return;
 
-        // Same for canvas UI (save panel, sliders, buttons). Without this a click
-        // on a button also paints the cell sitting behind it.
-        var events = UnityEngine.EventSystems.EventSystem.current;
-        if (events != null && events.IsPointerOverGameObject()) return;
+        // Same for the save panel and its buttons. Only rects marked with
+        // PointerBlocker count: EventSystem.IsPointerOverGameObject() would also
+        // match this scene's full-screen background Panels, which sit over the
+        // whole grid and would block drawing everywhere.
+        if (PointerBlocker.IsPointerOverAny()) return;
 
         bool left = Input.GetMouseButton(0);
         bool right = Input.GetMouseButton(1);
@@ -467,9 +468,11 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
     // Maps a stored color index to its tile (visual + chord color).
     public TileBase TileForColor(int c)
     {
-        if (c == 0) { Debug.Log("Returning yellow tile: " + alive2NeighborsTile?.name); return alive2NeighborsTile; }
-        if (c == 1) { Debug.Log("Returning beige tile: " + alive3NeighborsTile?.name); return alive3NeighborsTile; }
-        Debug.Log("Returning blue tile: " + aliveOtherTile?.name);
+        // No logging here: UpdateTilemap calls this once per living cell, every
+        // generation. On a full board that was thousands of Debug.Log calls per
+        // second, which stalls playback and floods the console.
+        if (c == 0) return alive2NeighborsTile;
+        if (c == 1) return alive3NeighborsTile;
         return aliveOtherTile;
     }
 
