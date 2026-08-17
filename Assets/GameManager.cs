@@ -17,18 +17,20 @@ public class GameOfLifeManager : MonoBehaviour
     //ㅅㄷㄴ셔ㅠㅎtesting github
     // Grid settings
     [SerializeField] public int gridSize = 50;
-    // AD1/AD2: per-generation melodic tones (color -> chord, mean Y -> pitch,
-    // mean X -> stereo pan). Auto-created in Start; clips load from Resources/Notes.
+    [SerializeField] private float baseUpdateInterval = 0.1f;
+
+    // AD1/AD2: per-generation histogram sonification (v1 algorithm). Alive cells are
+    // binned by color (chord) and by column (note = i % noteCount); each bin's CELL
+    // COUNT drives that note's loudness. mean X also pans the color. Auto-created in
+    // Start; clips load from Resources/Notes.
     [Header("Sonification")]
     [SerializeField] private MelodyPlayer melody;
-    [SerializeField, Range(0f, 1f)] private float melodyVolume = 0.6f; // AD1/AD2 note loudness
-    [SerializeField, Range(1f, 4f)] private float melodyPanStrength = 2.5f; // AD2 stereo spread (higher = more extreme)
-    [SerializeField, Range(0f, 0.5f)] private float melodyMinInterval = 0.12f; // min seconds between melody pulses (decouples from tempo)
-    [SerializeField, Range(0.1f, 4f)] private float melodySustainSeconds = 3.5f; // "pedal" hold: how long a held note rings before fading out
-    [SerializeField, Range(0.02f, 1f)] private float melodyCrossfadeSeconds = 0.3f; // legato glide when a color's pitch changes
-    [SerializeField, Range(0f, 0.5f)] private float melodyAttackSeconds = 0.08f;  // soft fade-in that rounds off each new note's onset
-    [SerializeField, Range(0.02f, 1f)] private float melodyReleaseSeconds = 0.3f; // fade-out when a held note's pedal time ends
-    [SerializeField, Range(1, 10)] private int melodyMaxVoicesPerColor = 6;       // safety cap on overlapping notes per color
+    [SerializeField, Range(0f, 1f)] private float melodyVolume = 0.6f; // AD1/AD2 master note loudness
+    [SerializeField, Range(1f, 4f)] private float melodyPanStrength = 2.5f; // AD2 stereo spread (mean column)
+    [SerializeField, Range(1, 10)] private int melodyTriggerEveryNTicks = 1;       // v1: re-trigger every N generations
+    [SerializeField, Range(1, 64)] private int melodyLoudnessSaturationCount = 8;  // v1: cell count in a bin that maps to full volume
+    [SerializeField, Range(0f, 0.5f)] private float melodyMinAudibleVolume = 0.02f; // v1: bins quieter than this are skipped
+    [SerializeField, Range(0f, 2f)] private float melodyRetriggerCooldown = 0.35f;  // seconds a note waits before re-striking (anti-pileup)
 
     // AD3: click effect sound played when painting a cell. Auto-created in Start
     // if left unassigned; loads its clips for the active soundscape from Resources.
@@ -57,12 +59,6 @@ public class GameOfLifeManager : MonoBehaviour
     [System.NonSerialized] public int[] cells;
     [System.NonSerialized] public int[] age;
     [System.NonSerialized] public int[] colorIndex;    // Per-cell stored color/chord: 0=Yellow/C, 1=Beige/F, 2=Blue/G
-
-    // Pre-allocated buffers to reduce GC
-    private int[] nextCells;
-    private int[] nextColorIndex;
-    private TileBase[] tileArray;
-
     private bool isPaused = true;
     private float timeSinceLastUpdate = 0f;
     private float currentUpdateInterval = 1f;
@@ -158,10 +154,6 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
         // Handle mouse drawing
         HandleMouseInput();
 
-        // AD1/AD2: per-frame melody envelope work (attack fade-in, pedal release).
-        if (melody != null && !isBeginningCutscene)
-            melody.UpdateVoices(melodySustainSeconds, melodyAttackSeconds, melodyReleaseSeconds);
-
         // AD5: drive the background loop's volume from the total alive-cell count.
         if (backgroundLoop != null && !isBeginningCutscene)
         {
@@ -180,22 +172,23 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
         cells = new int[gridSize * gridSize];
         age = new int[gridSize * gridSize];
         colorIndex = new int[gridSize * gridSize];
-        nextCells = new int[gridSize * gridSize];
-        nextColorIndex = new int[gridSize * gridSize];
-        tileArray = new TileBase[gridSize * gridSize];
     }
     
 
     public void NextGeneration()
     {
-        System.Array.Copy(cells, nextCells, cells.Length);
-        System.Array.Copy(colorIndex, nextColorIndex, colorIndex.Length);
+        int[] next = new int[cells.Length];
+        System.Array.Copy(cells, next, cells.Length);
 
-        for (int j = 0; j < gridSize; j++)
+        // Copy colors forward: surviving cells keep their color; newborns get one below.
+        int[] nextColor = new int[colorIndex.Length];
+        System.Array.Copy(colorIndex, nextColor, colorIndex.Length);
+
+        for (int i = 0; i < gridSize; i++)
         {
-            for (int i = 0; i < gridSize; i++)
+            for (int j = 0; j < gridSize; j++)
             {
-                int p = i + j * gridSize;
+                int p = Pos(i, j);
                 int neighbors = CountAliveNeighbors(i, j);
 
                 if (cells[p] == 1)
@@ -204,12 +197,12 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
                     if (neighbors < 2 || neighbors > 3)
                     {
                         // Dies from underpopulation or overpopulation
-                        nextCells[p] = 0;
+                        next[p] = 0;
                         age[p] = 0;
                     }
                     else
                     {
-                        // Survives — keeps its existing color (nextColorIndex[p] already copied).
+                        // Survives — keeps its existing color (nextColor[p] already copied).
                         age[p]++;
                     }
                 }
@@ -219,26 +212,20 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
                     if (neighbors == 3)
                     {
                         // Birth — inherit the majority color of the 3 living parents.
-                        nextCells[p] = 1;
+                        next[p] = 1;
                         age[p] = 1;
-                        nextColorIndex[p] = InheritColorIndex(i, j);
+                        nextColor[p] = InheritColorIndex(i, j);
                     }
                 }
             }
         }
 
-        int[] tempCells = cells;
-        cells = nextCells;
-        nextCells = tempCells;
-
-        int[] tempColors = colorIndex;
-        colorIndex = nextColorIndex;
-        nextColorIndex = tempColors;
-
+        cells = next;
+        colorIndex = nextColor;
         UpdateTilemap();
 
-        // AD1/AD2: one note per color this generation (mean Y -> pitch, mean X -> pan).
-        if (melody != null && !isBeginningCutscene) melody.PlayGeneration(this, melodyVolume, melodyPanStrength, melodyMinInterval, melodyMaxVoicesPerColor, melodyCrossfadeSeconds);
+        // AD1/AD2: v1 histogram sonification (column -> note bin, cell count -> loudness).
+        if (melody != null && !isBeginningCutscene) melody.PlayGeneration(this, melodyVolume, melodyPanStrength, melodyTriggerEveryNTicks, melodyLoudnessSaturationCount, melodyMinAudibleVolume, melodyRetriggerCooldown);
     }
 
     public int Pos(int i, int j)
@@ -252,19 +239,12 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
     int CountAliveNeighbors(int i, int j)
     {
         int count = 0;
-        for (int y = -1; y <= 1; y++)
+        for (int x = -1; x <= 1; x++)
         {
-            int nj = j + y;
-            if (nj < 0 || nj >= gridSize) continue;
-
-            for (int x = -1; x <= 1; x++)
+            for (int y = -1; y <= 1; y++)
             {
                 if (x == 0 && y == 0) continue;
-                int ni = i + x;
-                if (ni >= 0 && ni < gridSize)
-                {
-                    count += cells[ni + nj * gridSize];
-                }
+                count += cells[Pos(i + x, j + y)];
             }
         }
         return count;
@@ -272,38 +252,32 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
 
     public void UpdateTilemap()
     {
-        BoundsInt bounds = new BoundsInt(0, 0, 0, gridSize, gridSize, 1);
-        for (int j = 0; j < gridSize; j++)
+        for (int i = 0; i < gridSize; i++)
         {
-            for (int i = 0; i < gridSize; i++)
+            for (int j = 0; j < gridSize; j++)
             {
-                int index = i + j * gridSize;
+                Vector3Int position = new Vector3Int(i, j, 0);
+                int index = Pos(i, j);
+
                 if (cells[index] == 1)
                 {
-                    tileArray[index] = TileForColor(colorIndex[index]);
+                    // Cell is alive - draw its stored color
+                    UpdateCellTile(i, j);
                 }
                 else
                 {
-                    tileArray[index] = noNeighborssTile;
+                    // Cell is dead
+                    tilemap.SetTile(position, noNeighborssTile);
                 }
             }
         }
-        tilemap.SetTilesBlock(bounds, tileArray);
     }
 
     void ChangeCell(int i, int j, int value)
     {
-        int p = Pos(i, j);
+        cells[Pos(i, j)] = value;
         if (value == 0)
-        {
-            cells[p] = 0;
-            age[p] = 0;
-        }
-        else
-        {
-            if (cells[p] == 0) age[p] = 1;
-            cells[p] = 1;
-        }
+            age[Pos(i, j)] = 0;
     }
 
     int CountAlive()
@@ -413,6 +387,12 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
         // Don't paint or erase when the click lands on a palette button.
         if (palette != null && palette.IsPointerOverPalette()) return;
 
+        // Same for the save panel and its buttons. Only rects marked with
+        // PointerBlocker count: EventSystem.IsPointerOverGameObject() would also
+        // match this scene's full-screen background Panels, which sit over the
+        // whole grid and would block drawing everywhere.
+        if (PointerBlocker.IsPointerOverAny()) return;
+
         bool left = Input.GetMouseButton(0);
         bool right = Input.GetMouseButton(1);
 
@@ -488,6 +468,9 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
     // Maps a stored color index to its tile (visual + chord color).
     public TileBase TileForColor(int c)
     {
+        // No logging here: UpdateTilemap calls this once per living cell, every
+        // generation. On a full board that was thousands of Debug.Log calls per
+        // second, which stalls playback and floods the console.
         if (c == 0) return alive2NeighborsTile;
         if (c == 1) return alive3NeighborsTile;
         return aliveOtherTile;
@@ -517,23 +500,16 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
     int InheritColorIndex(int i, int j)
     {
         int[] tally = new int[3];
-        for (int y = -1; y <= 1; y++)
+        for (int x = -1; x <= 1; x++)
         {
-            int nj = j + y;
-            if (nj < 0 || nj >= gridSize) continue;
-
-            for (int x = -1; x <= 1; x++)
+            for (int y = -1; y <= 1; y++)
             {
                 if (x == 0 && y == 0) continue;
-                int ni = i + x;
-                if (ni >= 0 && ni < gridSize)
+                int np = Pos(i + x, j + y);
+                if (cells[np] == 1)
                 {
-                    int np = ni + nj * gridSize;
-                    if (cells[np] == 1)
-                    {
-                        int c = colorIndex[np];
-                        if (c >= 0 && c < 3) tally[c]++;
-                    }
+                    int c = colorIndex[np];
+                    if (c >= 0 && c < 3) tally[c]++;
                 }
             }
         }
@@ -546,6 +522,10 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
     // Getters for UI display
     public bool IsPaused => isPaused;
     public int AliveCount => CountAlive();
+
+    // Lets other scripts stop the simulation. Randomizing or loading a board
+    // pauses first, so the new state can be inspected before it evolves.
+    public void SetPaused(bool paused) => isPaused = paused;
 
     // Sonification accessors. Chord index convention: 0 = C, 1 = F, 2 = G.
     // Now driven by the cell's stored color, so audio voice == painted color.

@@ -2,78 +2,56 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
-// AD1 + AD2: per-generation melodic tones, played LEGATO (option 3 — smooth).
+// AD1 + AD2: per-generation sonification using the ORIGINAL (v1) HISTOGRAM mapping,
+// adapted to the current auto-loading clip infrastructure (swap sounds just by
+// editing the Resources/Notes/{Forest,Ocean} folder — no code changes needed).
 //
-// The big idea: a note's sharp attack is what makes the melody feel "discrete", so
-// we DON'T re-strike a color's note every generation. Instead each color behaves
-// like one finger held on a key:
-//   * Re-articulate only when that color's quantized pitch actually CHANGES (or when
-//     its note has fully decayed and needs refreshing). On a pitch change the old
-//     note crossfades into the new one (legato), so there is no gap or hard attack.
-//   * While the pitch is unchanged and still ringing, the note simply sustains; we
-//     only glide its stereo pan to follow the cells' mean X — movement without a
-//     re-attack.
-//   * A soft attack fade-in further rounds off each new note's onset.
+// v1 mapping (count -> loudness histogram):
+//   * Every alive cell is binned by its color (chord) and by COLUMN:
+//        noteIndex = column i % (number of clips that color provides)
+//   * The CELL COUNT in each (color, note) bin drives that note's LOUDNESS:
+//        volume = count / loudnessSaturationCount      (clamped 0..1)
+//     Bins quieter than minAudibleVolume are skipped, so several notes per color
+//     can sound at once — a chord whose internal balance reflects where the cells
+//     of that color sit across the grid's columns.
 //
-//   AD1 pitch <- mean Y, quantized across however many notes that color provides
-//                (bottom=low, top=high; level count = the color's clip pool, capped
-//                at the grid's row count).
-//   AD2 pan   <- mean X, linear left(-1)..right(+1), widened by panStrength.
+// Playback (v1 re-struck a one-shot every tick, which piled up into a wall of sound
+// with the long sustained note clips used here). Instead we keep the discrete attack
+// but BOUND it two ways so the background loop stays audible:
+//   * A fixed VOICE POOL with oldest-voice stealing caps total simultaneous notes.
+//   * A per-bin RE-TRIGGER COOLDOWN stops a single note from re-stacking every tick.
 //
-// Live controls (all on GameOfLifeManager, applied per call so sliders respond in
-// Play):
-//   sustainSeconds    pedal hold — how long a held note rings before it fades out.
-//   crossfadeSeconds  legato length when a pitch change replaces the old note.
-//   attackSeconds     fade-in that softens each new note's onset.
-//   maxVoicesPerColor safety cap on overlap (rarely hit now that we only re-articulate
-//                     on change); oldest is crossfaded out when exceeded.
+// AD2 pan (kept from the later version — v1 had no panning): each color's notes are
+// panned by that color's MEAN COLUMN, left(-1)..right(+1), widened by panStrength.
 //
-// Notes (~4s one-shots with their decay baked in) live in Resources/Notes/{Forest,
-// Ocean} as "{Env}_Color{1..3}_{N}" (N = 1..however many; 1 = lowest). To remap the
-// Y -> sound assignment just add / remove / renumber files in that folder — the count
-// per color follows the files automatically. The set is chosen by the active scene
-// (Soundscape2 = Ocean, else Forest). Auto-created on demand by GameOfLifeManager.
+// Notes live in Resources/Notes/{Forest,Ocean} as "{Env}_Color{1..3}_{N}"
+// (N = 1..however many; 1 = lowest). Add / remove / renumber files to remap the
+// column -> note assignment; the count per color follows the files automatically.
+// The set is chosen by the active scene (Soundscape2 = Ocean, else Forest).
 public class MelodyPlayer : MonoBehaviour
 {
     private const int ColorCount = 3;
-    private const int PoolSize = 32;          // hard ceiling near Unity's voice limit
-    private const float PanGlide = 8f;        // how fast a held note's pan tracks meanX
+    private const int PoolSize = 16;   // max simultaneous notes (loudness ceiling)
 
     // [color][step], low -> high. The COUNT per color is whatever clips that color
-    // provides in Resources (the pool size); colors may differ. Quantization uses
-    // each color's own length, capped at the grid's row count.
+    // provides in Resources (colors may differ).
     private AudioClip[][] colorNotes;
 
-    // One ringing (or fading) note.
-    private class Voice
-    {
-        public AudioSource src;
-        public int color = -1;                 // -1 = free/idle
-        public float startTime;
-        public float baseVolume;
-        public bool fading;
-        public float fadeStartTime;
-        public float fadeDuration;
-        public float fadeFromVolume;           // volume captured when the fade began
-    }
+    // Fixed pool of generic voices, reused via oldest-first stealing.
+    private AudioSource[] voices;
+    private float[] voiceStart;        // Time.time each voice last started (for stealing)
 
-    private Voice[] voices;
-    private readonly int[] lastStep = new int[ColorCount];   // -1 = color silent
-    private float lastTriggerTime = -999f;                   // tempo-decoupling throttle
-
-    // Latest tuning cached from UpdateVoices (used by the per-frame envelope work).
-    private float curSustain = 2.5f;
-    private float curAttack = 0.08f;
-    private float curRelease = 0.25f;
+    private int tickCounter;
+    private int maxNotes;              // widest note pool across colors (buffer width)
+    private int[,] counts;             // [color, note] cell tally, reused each generation
+    private float[,] lastPlay;         // [color, note] last trigger time (cooldown)
 
     // Scratch buffers reused each generation (no per-frame allocation).
-    private readonly int[] count = new int[ColorCount];
-    private readonly float[] sumX = new float[ColorCount];
-    private readonly float[] sumY = new float[ColorCount];
+    private readonly int[] count = new int[ColorCount];   // alive cells per color
+    private readonly float[] sumX = new float[ColorCount]; // sum of columns per color
 
     void Awake()
     {
-        for (int c = 0; c < ColorCount; c++) lastStep[c] = -1;
         LoadNotes();
         BuildVoices();
     }
@@ -96,6 +74,7 @@ public class MelodyPlayer : MonoBehaviour
         }
 
         colorNotes = new AudioClip[ColorCount][];
+        maxNotes = 0;
         for (int col = 0; col < ColorCount; col++)
         {
             perColor[col].Sort((a, b) => a.Key.CompareTo(b.Key)); // _1 = lowest .. _N = highest
@@ -103,10 +82,18 @@ public class MelodyPlayer : MonoBehaviour
             for (int i = 0; i < perColor[col].Count; i++)
                 colorNotes[col][i] = perColor[col][i].Value;
 
+            maxNotes = Mathf.Max(maxNotes, colorNotes[col].Length);
+
             if (colorNotes[col].Length == 0)
                 Debug.LogWarning($"MelodyPlayer: no note clips for color {col + 1} in " +
                                  $"Resources/Notes/{env} (expected '{env}_Color{col + 1}_N')");
         }
+
+        int w = Mathf.Max(1, maxNotes);
+        counts = new int[ColorCount, w];
+        lastPlay = new float[ColorCount, w];
+        for (int c = 0; c < ColorCount; c++)
+            for (int n = 0; n < w; n++) lastPlay[c, n] = -999f;
     }
 
     // Parse a clip name like "{Env}_Color{C}_{N}" into color (0-based) and index N.
@@ -122,7 +109,8 @@ public class MelodyPlayer : MonoBehaviour
 
     void BuildVoices()
     {
-        voices = new Voice[PoolSize];
+        voices = new AudioSource[PoolSize];
+        voiceStart = new float[PoolSize];
         for (int i = 0; i < PoolSize; i++)
         {
             var go = new GameObject($"MelodyVoice_{i}");
@@ -130,206 +118,106 @@ public class MelodyPlayer : MonoBehaviour
             var src = go.AddComponent<AudioSource>();
             src.playOnAwake = false;
             src.loop = false;
-            src.spatialBlend = 0f;
-            voices[i] = new Voice { src = src };
+            src.spatialBlend = 0f; // 2D — pan handled manually via panStereo
+            voices[i] = src;
+            voiceStart[i] = -999f;
         }
     }
 
     // Called once per generation by GameOfLifeManager.
+    //   volume                  master note loudness (slider).
+    //   panStrength             AD2 stereo spread applied to each color's mean column.
+    //   triggerEveryNTicks      v1 tempo: only re-evaluate every N generations.
+    //   loudnessSaturationCount cell count in a bin that maps to full volume (1.0).
+    //   minAudibleVolume        bins quieter than this are skipped (not triggered).
+    //   retriggerCooldown       seconds a given note must wait before re-striking
+    //                           (stops one note from stacking into a wall).
     public void PlayGeneration(GameOfLifeManager game, float volume, float panStrength,
-                               float minInterval, int maxVoicesPerColor, float crossfadeSeconds)
+                               int triggerEveryNTicks, int loudnessSaturationCount,
+                               float minAudibleVolume, float retriggerCooldown)
     {
-        if (colorNotes == null || voices == null) return;
+        if (colorNotes == null || voices == null || counts == null) return;
 
-        // Throttle: don't re-evaluate the melody faster than this (decouples from tempo).
-        if (Time.time - lastTriggerTime < minInterval) return;
-        lastTriggerTime = Time.time;
+        // v1 tempo: only re-evaluate every N generations.
+        int everyN = Mathf.Max(1, triggerEveryNTicks);
+        tickCounter++;
+        if (tickCounter % everyN != 0) return;
 
         int size = game.GridSize;
-        for (int c = 0; c < ColorCount; c++) { count[c] = 0; sumX[c] = 0f; sumY[c] = 0f; }
-
-        for (int j = 0; j < size; j++)       // j = row (0 = bottom, size-1 = top)
+        for (int c = 0; c < ColorCount; c++)
         {
-            for (int i = 0; i < size; i++)   // i = column (0 = left, size-1 = right)
+            count[c] = 0; sumX[c] = 0f;
+            for (int n = 0; n < maxNotes; n++) counts[c, n] = 0;
+        }
+
+        // Histogram: bin every alive cell by color and by column (i % noteCount).
+        for (int j = 0; j < size; j++)       // j = row
+        {
+            for (int i = 0; i < size; i++)   // i = column
             {
                 int col = game.GetChordIndex(i, j);
                 if (col < 0 || col >= ColorCount) continue; // dead cell
+                int noteCount = colorNotes[col].Length;
+                if (noteCount == 0) continue;               // this color has no clips
+                int noteIdx = i % noteCount;                // COLUMN -> note bin
+                counts[col, noteIdx]++;
                 count[col]++;
                 sumX[col] += i;
-                sumY[col] += j;
             }
         }
 
+        float now = Time.time;
         float denom = size > 1 ? size - 1f : 1f;
-        float vol = Mathf.Clamp01(volume);
-        int cap = Mathf.Max(1, maxVoicesPerColor);
-        float xfade = Mathf.Max(0.01f, crossfadeSeconds);
+        float master = Mathf.Clamp01(volume);
+        int sat = Mathf.Max(1, loudnessSaturationCount);
+        float cooldown = Mathf.Max(0f, retriggerCooldown);
 
         for (int col = 0; col < ColorCount; col++)
         {
-            if (count[col] == 0)
-            {
-                // Color vanished -> let its note fade away and forget its pitch.
-                if (lastStep[col] != -1) { FadeColor(col, xfade); lastStep[col] = -1; }
-                continue;
-            }
+            if (count[col] == 0) continue;
 
-            AudioClip[] notes = colorNotes[col];
-            int poolCount = notes != null ? notes.Length : 0;
-            if (poolCount == 0) continue;            // this color has no clips
-
+            // AD2 pan: this color's mean column, linear left(-1)..right(+1), widened.
             float meanX = sumX[col] / count[col];
-            float meanY = sumY[col] / count[col];
-
-            // Pitch levels = this color's pool count, but never more than grid rows.
-            int levels = Mathf.Min(poolCount, size);
-            float normY = Mathf.Clamp01(meanY / denom);
-            int step = levels > 1 ? Mathf.RoundToInt(normY * (levels - 1)) : 0;
             float pan = Mathf.Clamp(((meanX / denom) * 2f - 1f) * panStrength, -1f, 1f);
 
-            AudioClip clip = notes[step];
-            if (clip == null) continue;
+            int notes = colorNotes[col].Length;
+            for (int n = 0; n < notes; n++)
+            {
+                int cnt = counts[col, n];
+                if (cnt == 0) continue;
 
-            bool hasActive = HasActiveVoice(col);
-            bool changed = step != lastStep[col];
+                // v1: count -> loudness; skip near-silent bins on the raw ratio.
+                float ratio = Mathf.Clamp01((float)cnt / sat);
+                if (ratio < minAudibleVolume) continue;
 
-            if (changed)
-            {
-                if (hasActive) FadeColor(col, xfade);     // legato: glide off the old pitch
-                TriggerNote(col, clip, pan, vol, cap, xfade);
-                lastStep[col] = step;
-            }
-            else if (!hasActive)
-            {
-                TriggerNote(col, clip, pan, vol, cap, xfade); // refresh a decayed note
-                lastStep[col] = step;
-            }
-            else
-            {
-                SetColorPan(col, pan);                    // sustain: just track stereo
+                // Cooldown: don't re-strike this same note until it has rested.
+                if (now - lastPlay[col, n] < cooldown) continue;
+
+                AudioClip clip = colorNotes[col][n];
+                if (clip == null) continue;
+
+                int v = AcquireVoice(now);                  // free voice, else steal oldest
+                voices[v].clip = clip;
+                voices[v].panStereo = pan;
+                voices[v].volume = ratio * master;
+                voices[v].Play();
+                voiceStart[v] = now;
+                lastPlay[col, n] = now;
             }
         }
     }
 
-    // Layer a new note for a color, crossfading out the oldest if the cap is reached.
-    void TriggerNote(int color, AudioClip clip, float pan, float volume, int cap, float xfade)
+    // Return a free voice index if any; otherwise steal the oldest-started one.
+    int AcquireVoice(float now)
     {
-        EnforceCap(color, cap, xfade);
-
-        Voice v = GetFreeVoice();
-        if (v == null) return;   // pool exhausted (very rare) -> drop this note
-
-        v.color = color;
-        v.startTime = Time.time;
-        v.baseVolume = volume;
-        v.fading = false;
-        v.src.clip = clip;
-        v.src.panStereo = pan;
-        v.src.volume = curAttack > 0f ? 0f : volume;   // fade-in handled in UpdateVoices
-        v.src.Play();
-    }
-
-    // Per-frame envelope work, driven by GameOfLifeManager.Update (live tuning).
-    public void UpdateVoices(float sustainSeconds, float attackSeconds, float releaseSeconds)
-    {
-        curSustain = Mathf.Max(0.05f, sustainSeconds);
-        curAttack = Mathf.Max(0f, attackSeconds);
-        curRelease = Mathf.Max(0.005f, releaseSeconds);
-        if (voices == null) return;
-
-        float now = Time.time;
+        int oldest = 0;
+        float oldestStart = float.MaxValue;
         for (int i = 0; i < voices.Length; i++)
         {
-            Voice v = voices[i];
-            if (v.color < 0) continue;  // free
-
-            if (!v.fading)
-            {
-                if (!v.src.isPlaying) { FreeVoice(v); continue; }   // sample ended on its own
-
-                float age = now - v.startTime;
-                if (age >= curSustain) { BeginFade(v, curRelease); }      // pedal released
-                else if (curAttack > 0f && age < curAttack)               // soft onset
-                    v.src.volume = Mathf.Lerp(0f, v.baseVolume, age / curAttack);
-                else
-                    v.src.volume = v.baseVolume;
-            }
-
-            if (v.fading)
-            {
-                float t = v.fadeDuration > 0f ? (now - v.fadeStartTime) / v.fadeDuration : 1f;
-                if (t >= 1f) { v.src.Stop(); FreeVoice(v); }
-                else v.src.volume = Mathf.Lerp(v.fadeFromVolume, 0f, t);
-            }
+            if (!voices[i].isPlaying) return i;
+            if (voiceStart[i] < oldestStart) { oldestStart = voiceStart[i]; oldest = i; }
         }
-    }
-
-    // If a color already has `cap` non-fading voices, crossfade out its oldest.
-    void EnforceCap(int color, int cap, float xfade)
-    {
-        int active = 0;
-        Voice oldest = null;
-        for (int i = 0; i < voices.Length; i++)
-        {
-            Voice v = voices[i];
-            if (v.color == color && !v.fading)
-            {
-                active++;
-                if (oldest == null || v.startTime < oldest.startTime) oldest = v;
-            }
-        }
-        if (active >= cap && oldest != null) BeginFade(oldest, xfade);
-    }
-
-    bool HasActiveVoice(int color)
-    {
-        for (int i = 0; i < voices.Length; i++)
-        {
-            Voice v = voices[i];
-            if (v.color == color && !v.fading && v.src.isPlaying) return true;
-        }
-        return false;
-    }
-
-    // Glide the pan of a color's held (non-fading) note(s) toward the new value.
-    void SetColorPan(int color, float pan)
-    {
-        for (int i = 0; i < voices.Length; i++)
-        {
-            Voice v = voices[i];
-            if (v.color == color && !v.fading)
-                v.src.panStereo = Mathf.MoveTowards(v.src.panStereo, pan, PanGlide * Time.deltaTime);
-        }
-    }
-
-    void FadeColor(int color, float dur)
-    {
-        for (int i = 0; i < voices.Length; i++)
-        {
-            Voice v = voices[i];
-            if (v.color == color && !v.fading) BeginFade(v, dur);
-        }
-    }
-
-    void BeginFade(Voice v, float dur)
-    {
-        v.fading = true;
-        v.fadeStartTime = Time.time;
-        v.fadeDuration = Mathf.Max(0.005f, dur);
-        v.fadeFromVolume = v.src.volume;
-    }
-
-    void FreeVoice(Voice v)
-    {
-        v.src.Stop();
-        v.color = -1;
-        v.fading = false;
-    }
-
-    Voice GetFreeVoice()
-    {
-        for (int i = 0; i < voices.Length; i++)
-            if (voices[i].color < 0) return voices[i];
-        return null;
+        voices[oldest].Stop();
+        return oldest;
     }
 }
