@@ -33,7 +33,7 @@ public class FootstepPlayer : MonoBehaviour
     {
         // Soundscape2 = Ocean (env 2); everything else falls back to Forest (env 1).
         string scene = SceneManager.GetActiveScene().name;
-        string folder = scene == "Soundscape2" ? "Footsteps/Ocean" : "Footsteps/Forest";
+        string folder = scene.Contains("2") ? "Footsteps/Ocean" : "Footsteps/Forest";
         return Resources.LoadAll<AudioClip>(folder);
     }
 

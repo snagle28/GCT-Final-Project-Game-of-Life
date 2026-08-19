@@ -185,7 +185,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
+    rgba: 0
   m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -504,7 +504,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 33554432
+    rgba: 637534208
   m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -1111,7 +1111,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
+    rgba: 0
   m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -1348,10 +1348,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ffa4e4b5fbf84bf093232c196556549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Sonifier
-  game: {fileID: 791970130}
-  palette: {fileID: 11400000, guid: 0d491f5bcdd7842b68e06ea0e9048eb6, type: 2}
-  config: {fileID: 11400000, guid: c32c2cad095554c50ae59e362b296cd4, type: 2}
-  voicePool: {fileID: 1644753531}
 --- !u!1 &521814926
 GameObject:
   m_ObjectHideFlags: 0
@@ -1817,12 +1813,10 @@ MonoBehaviour:
   melody: {fileID: 0}
   melodyVolume: 0.6
   melodyPanStrength: 2.5
-  melodyMinInterval: 0.12
-  melodySustainSeconds: 3.5
-  melodyCrossfadeSeconds: 0.3
-  melodyAttackSeconds: 0.08
-  melodyReleaseSeconds: 0.3
-  melodyMaxVoicesPerColor: 6
+  melodyTriggerEveryNTicks: 1
+  melodyLoudnessSaturationCount: 8
+  melodyMinAudibleVolume: 0.02
+  melodyRetriggerCooldown: 0.35
   footstep: {fileID: 0}
   footstepVolume: 1
   startSound: {fileID: 0}
@@ -1833,6 +1827,8 @@ MonoBehaviour:
   bgCapFraction: 0.3
   bgSmoothing: 0.1
   palette: {fileID: 0}
+  useFixedMusic: 0
+  fixedMusicSource: {fileID: 0}
 --- !u!4 &791970131
 Transform:
   m_ObjectHideFlags: 0
@@ -2452,7 +2448,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
+    rgba: 0
   m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -2552,7 +2548,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3759300c4f34424e8b9551c3a58cbdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoicePool
-  palette: {fileID: 11400000, guid: 0d491f5bcdd7842b68e06ea0e9048eb6, type: 2}
 --- !u!4 &1644753532
 Transform:
   m_ObjectHideFlags: 0
@@ -2615,7 +2610,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
+    rgba: 0
   m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3

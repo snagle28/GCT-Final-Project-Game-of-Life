@@ -55,6 +55,12 @@ public class GameOfLifeManager : MonoBehaviour
     [Header("Drawing")]
     [SerializeField] private ColorPalette palette;
 
+    // --- 상은: 새로 추가된 부분: _R 버전을 위한 스위치와 오디오 소스 ---
+    [Header("R Version Music Settings")]
+    [SerializeField] private bool useFixedMusic = false; // 체크하면 멜로디 대신 지정 음악 사용
+    [SerializeField] private AudioSource fixedMusicSource; // 지정 음악을 재생할 소스
+    // -------------------------------------------------------------
+
     // Game state
     [System.NonSerialized] public int[] cells;
     [System.NonSerialized] public int[] age;
@@ -122,8 +128,8 @@ private int[][] glider = {
 
         isBeginningCutscene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Beginning Cutscene";
 
-        // AD1/AD2: ensure the per-generation melody player exists.
-if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
+        // 수정: useFixedMusic이 false일 때만(오리지널) 멜로디 플레이어 생성
+        if (!useFixedMusic && melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
 
         // AD3: ensure a footstep click-sound player exists (volume passed per Play).
         if (footstep == null) footstep = gameObject.AddComponent<FootstepPlayer>();
@@ -133,6 +139,13 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
 
         // AD5: ensure the background loop player exists (it starts playing on Awake).
         if (backgroundLoop == null) backgroundLoop = gameObject.AddComponent<BackgroundLoopPlayer>();
+
+        // 상은: 추가: _R 버전이면 시작 시 정지 상태에 맞춰 음악도 일시정지 해둠
+        if (useFixedMusic && fixedMusicSource != null)
+        {
+            if (isPaused) fixedMusicSource.Pause();
+            else fixedMusicSource.Play();
+        }
     }
 
     void Update()
@@ -224,8 +237,9 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
         colorIndex = nextColor;
         UpdateTilemap();
 
-        // AD1/AD2: v1 histogram sonification (column -> note bin, cell count -> loudness).
-        if (melody != null && !isBeginningCutscene) melody.PlayGeneration(this, melodyVolume, melodyPanStrength, melodyTriggerEveryNTicks, melodyLoudnessSaturationCount, melodyMinAudibleVolume, melodyRetriggerCooldown);
+        // 상은: 함수 맨 밑의 AD1/AD2 소니피케이션 부분 수정 (!useFixedMusic 조건 추가)
+        if (!useFixedMusic && melody != null && !isBeginningCutscene) 
+            melody.PlayGeneration(this, melodyVolume, melodyPanStrength, melodyTriggerEveryNTicks, melodyLoudnessSaturationCount, melodyMinAudibleVolume, melodyRetriggerCooldown);
     }
 
     public int Pos(int i, int j)
@@ -333,6 +347,13 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
 
             // AD4: play the start/stop effect on every play/pause toggle.
             if (startSound != null && !isBeginningCutscene) startSound.Play(startSoundVolume);
+
+            // 상은: 추가: 스페이스바 누를 때 지정 음악도 함께 재생/정지
+            if (useFixedMusic && fixedMusicSource != null)
+            {
+                if (isPaused) fixedMusicSource.Pause();
+                else if (!fixedMusicSource.isPlaying) fixedMusicSource.Play();
+            }
         }
 
         // C to clear
@@ -525,8 +546,16 @@ if (melody == null) melody = gameObject.AddComponent<MelodyPlayer>();
 
     // Lets other scripts stop the simulation. Randomizing or loading a board
     // pauses first, so the new state can be inspected before it evolves.
-    public void SetPaused(bool paused) => isPaused = paused;
-
+    public void SetPaused(bool paused)
+    {
+        isPaused = paused;
+        // 외부에서 멈추라고 신호를 보낼 때, 음악도 같이 멈추게(또는 재생하게) 만듭니다.
+        if (useFixedMusic && fixedMusicSource != null)
+        {
+            if (isPaused) fixedMusicSource.Pause();
+            else if (!fixedMusicSource.isPlaying) fixedMusicSource.Play();
+        }
+    }
     // Sonification accessors. Chord index convention: 0 = C, 1 = F, 2 = G.
     // Now driven by the cell's stored color, so audio voice == painted color.
     public int GridSize => gridSize;

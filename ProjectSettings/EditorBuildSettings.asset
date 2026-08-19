@@ -20,6 +20,15 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Instructions.unity
     guid: 558640b0bccdb1f478eba04916eb9bdd
+  - enabled: 1
+    path: Assets/Scenes/Intro Sound_R.unity
+    guid: 197f4705d49b14f0497e325a1ddca3bf
+  - enabled: 1
+    path: Assets/Scenes/Soundscape1_R.unity
+    guid: c4ef4a89bfb3c4bc784b57cde377eeb7
+  - enabled: 1
+    path: Assets/Scenes/Soundscape2_R.unity
+    guid: 7b70f919883624d959a0fb001cef4672
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

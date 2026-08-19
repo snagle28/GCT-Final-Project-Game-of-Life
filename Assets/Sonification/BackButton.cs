@@ -20,9 +20,10 @@ public class BackButton : MonoBehaviour
     public void GoBack()
     {
         SceneManagement.skipIntro = true;
-        var sm = Object.FindFirstObjectByType<SceneManagement>();
-        if (sm != null) sm.MoveToSelect();
-        else SceneManager.LoadScene(SelectScene);
+        var sm = Object.FindAnyObjectByType<SceneManagement>();
+        
+        if (sm != null) sm.MoveToSelect(); // 매니저가 있으면 페이드아웃 효과와 함께 정상 작동!
+        else SceneManager.LoadScene(SceneManager.GetActiveScene().name.Contains("_R") ? "Intro Sound_R" : "Intro Sound"); // 비상시 목적지 분기
     }
 }
 

@@ -2475,6 +2475,8 @@ MonoBehaviour:
   bgCapFraction: 0.7
   bgSmoothing: 0.1
   palette: {fileID: 326920496}
+  useFixedMusic: 0
+  fixedMusicSource: {fileID: 0}
 --- !u!114 &266635613
 MonoBehaviour:
   m_ObjectHideFlags: 0

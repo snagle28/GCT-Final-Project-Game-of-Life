@@ -38,7 +38,7 @@ public class SceneManagement : MonoBehaviour
         // Intro Sound has several SceneManagement components; only the one that owns
         // the timeline director drives the screen state. Gate on director != null so
         // a director-less instance doesn't consume the flag before the real one runs.
-        if (skipIntro && SceneManager.GetActiveScene().buildIndex == 1 && director != null)
+        if (skipIntro && SceneManager.GetActiveScene().name.StartsWith("Intro Sound") && director != null)
         {
             buttonClicked = true;   // == "click to begin" already pressed
             skipIntro = false;      // consume only when the right instance handles it
@@ -76,7 +76,7 @@ public class SceneManagement : MonoBehaviour
             myWindow.position = Vector3.Lerp(myWindow.position, target, Time.deltaTime * 0.2f);
         }
 
-        if (SceneManager.GetActiveScene().buildIndex == 1)
+        if (SceneManager.GetActiveScene().name.StartsWith("Intro Sound"))
         {
             if (!buttonClicked)
             {
@@ -97,12 +97,15 @@ public class SceneManagement : MonoBehaviour
 
     public void MoveToSoundscape1()
     {
-        StartCoroutine(FadeAndLoad("Soundscape1"));
+        // 현재 씬 이름이 _R로 끝나면 Soundscape1_R로 이동
+        string target = SceneManager.GetActiveScene().name.EndsWith("_R") ? "Soundscape1_R" : "Soundscape1";
+        StartCoroutine(FadeAndLoad(target));
     }
 
     public void MoveToSoundscape2()
     {
-        StartCoroutine(FadeAndLoad("Soundscape2"));
+        string target = SceneManager.GetActiveScene().name.EndsWith("_R") ? "Soundscape2_R" : "Soundscape2";
+        StartCoroutine(FadeAndLoad(target));
     }
 
     public void MoveToInstructions()
@@ -113,7 +116,8 @@ public class SceneManagement : MonoBehaviour
 
     public void MoveToPreviousScene()
     {
-        string target = string.IsNullOrEmpty(lastSoundscape) ? "Intro Sound" : lastSoundscape;
+        string defaultTarget = SceneManager.GetActiveScene().name.Contains("_R") ? "Intro Sound_R" : "Intro Sound";
+        string target = string.IsNullOrEmpty(lastSoundscape) ? defaultTarget : lastSoundscape;
         StartCoroutine(FadeAndLoad(target));
     }
 
@@ -122,8 +126,10 @@ public class SceneManagement : MonoBehaviour
     // fade-to-black as the forward loads.
     public void MoveToSelect()
     {
-        skipIntro = true;   // land on the selection loop, not the replayed intro
-        StartCoroutine(FadeAndLoad("Intro Sound"));
+        skipIntro = true;
+        // 뒤로가기 누를 때 원래 메뉴인지 _R 메뉴인지 구별해서 복귀
+        string target = SceneManager.GetActiveScene().name.Contains("_R") ? "Intro Sound_R" : "Intro Sound";
+        StartCoroutine(FadeAndLoad(target));
     }
 
     private IEnumerator FadeAndLoad(string sceneName)

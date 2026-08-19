@@ -32,7 +32,7 @@ public class StartSoundPlayer : MonoBehaviour
     {
         // Soundscape2 = Ocean (env 2); everything else falls back to Forest (env 1).
         string scene = SceneManager.GetActiveScene().name;
-        string folder = scene == "Soundscape2" ? "StartSounds/Ocean" : "StartSounds/Forest";
+        string folder = scene.Contains("2") ? "StartSounds/Ocean" : "StartSounds/Forest";
         AudioClip[] all = Resources.LoadAll<AudioClip>(folder);
         return (all != null && all.Length > 0) ? all[0] : null;
     }

@@ -49,6 +49,7 @@ public class MelodyPlayer : MonoBehaviour
     // Scratch buffers reused each generation (no per-frame allocation).
     private readonly int[] count = new int[ColorCount];   // alive cells per color
     private readonly float[] sumX = new float[ColorCount]; // sum of columns per color
+    private readonly float[] sumY = new float[ColorCount]; // 새로 추가: sum of rows (높이)
 
     void Awake()
     {
@@ -146,7 +147,7 @@ public class MelodyPlayer : MonoBehaviour
         int size = game.GridSize;
         for (int c = 0; c < ColorCount; c++)
         {
-            count[c] = 0; sumX[c] = 0f;
+            count[c] = 0; sumX[c] = 0f; sumY[c] = 0f;
             for (int n = 0; n < maxNotes; n++) counts[c, n] = 0;
         }
 
@@ -157,11 +158,9 @@ public class MelodyPlayer : MonoBehaviour
             {
                 int col = game.GetChordIndex(i, j);
                 if (col < 0 || col >= ColorCount) continue; // dead cell
-                int noteCount = colorNotes[col].Length;
-                if (noteCount == 0) continue;               // this color has no clips
-                int noteIdx = i % noteCount;                // COLUMN -> note bin
-                counts[col, noteIdx]++;
+
                 count[col]++;
+                sumY[col] += j;
                 sumX[col] += i;
             }
         }
@@ -180,30 +179,34 @@ public class MelodyPlayer : MonoBehaviour
             float meanX = sumX[col] / count[col];
             float pan = Mathf.Clamp(((meanX / denom) * 2f - 1f) * panStrength, -1f, 1f);
 
-            int notes = colorNotes[col].Length;
-            for (int n = 0; n < notes; n++)
-            {
-                int cnt = counts[col, n];
-                if (cnt == 0) continue;
+            int noteCount = colorNotes[col].Length;
+            if (noteCount == 0) continue;
 
-                // v1: count -> loudness; skip near-silent bins on the raw ratio.
-                float ratio = Mathf.Clamp01((float)cnt / sat);
-                if (ratio < minAudibleVolume) continue;
+            // Y축(높이) 평균을 구해서 1개의 음(noteIdx)만 선택!
+            float meanY = sumY[col] / count[col];
+            float ratioY = meanY / denom;
+            int noteIdx = Mathf.FloorToInt(ratioY * noteCount);
+            noteIdx = Mathf.Clamp(noteIdx, 0, noteCount - 1);
 
-                // Cooldown: don't re-strike this same note until it has rested.
-                if (now - lastPlay[col, n] < cooldown) continue;
+            // 세포 개수에 따른 볼륨 
+            float ratio = Mathf.Clamp01((float)count[col] / sat);
+            if (ratio < minAudibleVolume) continue;
+            
+            // 쿨다운 체크
+            if (now - lastPlay[col, noteIdx] < cooldown) continue;
 
-                AudioClip clip = colorNotes[col][n];
-                if (clip == null) continue;
+            AudioClip clip = colorNotes[col][noteIdx];
+            if (clip == null) continue;
 
-                int v = AcquireVoice(now);                  // free voice, else steal oldest
-                voices[v].clip = clip;
-                voices[v].panStereo = pan;
-                voices[v].volume = ratio * master;
-                voices[v].Play();
-                voiceStart[v] = now;
-                lastPlay[col, n] = now;
-            }
+            // 선택된 딱 1개의 음만 재생
+            int v = AcquireVoice(now);                  
+            voices[v].clip = clip;
+            voices[v].panStereo = pan; // meanX로 계산된 pan 그대로 사용
+            voices[v].volume = ratio * master;
+            voices[v].Play();
+            
+            voiceStart[v] = now;
+            lastPlay[col, noteIdx] = now;
         }
     }
 
