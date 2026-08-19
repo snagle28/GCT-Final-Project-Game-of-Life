@@ -3,7 +3,7 @@ import math
 from pydub import AudioSegment
 
 # --- 설정 값 ---
-TOTAL_DURATION_MS = 4 * 60 * 1000  # 5분 (밀리초)
+TOTAL_DURATION_MS = 4 * 60 * 1000  # 4분 (밀리초)
 COLORS = ["Forest_Color1", "Forest_Color2", "Forest_Color3"]
 NUM_NOTES = 12
 BASE_BPM = 140
@@ -39,7 +39,7 @@ output = AudioSegment.silent(duration=TOTAL_DURATION_MS + 2000)
 current_time_ms = 0
 bpm_phase = 0
 
-print("5분짜리 랜덤 사운드스케이프를 생성하는 중입니다. 잠시만 기다려주세요...")
+print("4분짜리 랜덤 사운드스케이프를 생성하는 중입니다. 잠시만 기다려주세요...")
 
 # 3. 시간 순서대로 믹싱 루프 (그리드 기반)
 while current_time_ms < TOTAL_DURATION_MS:
