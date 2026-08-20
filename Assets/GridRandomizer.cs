@@ -40,7 +40,7 @@ public class GridRandomizer : MonoBehaviour
 
     void Awake()
     {
-        if (game == null) game = Object.FindFirstObjectByType<GameOfLifeManager>();
+        if (game == null) game = Object.FindAnyObjectByType<GameOfLifeManager>();
         rng = new System.Random(System.Guid.NewGuid().GetHashCode());
         pendingStartRandomize = randomizeOnStart;
     }
@@ -72,6 +72,7 @@ public class GridRandomizer : MonoBehaviour
             Debug.LogWarning("GridRandomizer: no GameOfLifeManager found, or its grid isn't ready yet.");
             return;
         }
+        game.LogAction("Button,Randomize");
 
         fillDensity = Mathf.Clamp01(fillDensity);
         int palette = Mathf.Clamp(colorCount, 1, 3);

@@ -68,6 +68,7 @@ public class GameOfLifeManager : MonoBehaviour
     private bool isPaused = true;
     private float timeSinceLastUpdate = 0f;
     private float currentUpdateInterval = 1f;
+    private float lastTempoLogTime = 0f;
     private bool isBeginningCutscene;
     
     // Pattern definitions (matching Processing patterns)
@@ -123,6 +124,7 @@ private int[][] glider = {
 
     void Start()
     {
+        Debug.Log("Saved: " + Application.persistentDataPath);
         InitializeGrid();
         //RandomSeedGrid(0.5f); // 50% chance like Processing
 
@@ -344,6 +346,7 @@ private int[][] glider = {
         {
             isPaused = !isPaused;
             Debug.Log("Paused: " + isPaused);
+            LogAction("Spacebar," + (isPaused ? "Paused" : "Played")); // 로그 기록
 
             // AD4: play the start/stop effect on every play/pause toggle.
             if (startSound != null && !isBeginningCutscene) startSound.Play(startSoundVolume);
@@ -361,6 +364,7 @@ private int[][] glider = {
         {
             ClearGrid();
             Debug.Log("Grid cleared");
+            LogAction("Key_C,Grid Cleared"); // 로그 기록용
         }
 
         // Pattern shortcuts
@@ -368,18 +372,21 @@ private int[][] glider = {
         {
             SetPatternAtMouse(glider);
             Debug.Log("Glider placed");
+            LogAction("Pattern,Glider"); // G 눌렀을 때
         }
 
         if (Input.GetKeyDown(KeyCode.B))
         {
             SetPatternAtMouse(blinker);
             Debug.Log("Blinker placed");
+            LogAction("Pattern,Blinker"); // B 눌렀을 때
         }
 
         if (Input.GetKeyDown(KeyCode.T))
         {
             SetPatternAtMouse(toad);
             Debug.Log("Toad placed");
+            LogAction("Pattern,Toad"); // T 눌렀을 때
         }
 
         if (Input.GetKeyDown(KeyCode.M))
@@ -388,18 +395,21 @@ private int[][] glider = {
             SetPatternAtMouse(p101);
             isPaused = true; //place moth
             Debug.Log("P101 placed - paused");
+            LogAction("Pattern,P101"); // M 눌렀을 때
         }
         
         if (Input.GetKeyDown(KeyCode.D))
         {
             SetPatternAtMouse(diamond);
             Debug.Log("Diamond placed");
+            LogAction("Pattern,Diamond"); // D 눌렀을 때
         }
 
         if (Input.GetKeyDown(KeyCode.P))
         {
             SetPatternAtMouse(pulsar);
             Debug.Log("Pulsar placed");
+            LogAction("Pattern,Pulsar"); // P 눌렀을 때
         }
     }
 
@@ -444,6 +454,7 @@ private int[][] glider = {
         {
             ChangeCell(i, j, 0);
             tilemap.SetTile(new Vector3Int(i, j, 0), noNeighborssTile);
+            LogAction("Mouse,EraseCell"); // 로그 기록용
         }
     }
 
@@ -460,6 +471,7 @@ private int[][] glider = {
         // AD3: play a random click effect only when a cell is newly placed, so
         // dragging across already-painted cells doesn't machine-gun the sound.
         if (wasDead && footstep != null && !isBeginningCutscene) footstep.Play(footstepVolume);
+        if (wasDead) LogAction("Mouse,PaintCell"); //로그 기록용
     }
 
     public void UpdateCellTile(int i, int j)
@@ -575,5 +587,22 @@ private int[][] glider = {
         float minInterval = 1f / 30f;
         float maxInterval = 1f;
         currentUpdateInterval = Mathf.Lerp(maxInterval, minInterval, Mathf.Sqrt(t));
+        if (Time.time - lastTempoLogTime >= 1.0f)
+        {
+            LogAction("TempoSlider," + t.ToString("F2"));
+            lastTempoLogTime = Time.time; // 마지막 기록 시간을 지금으로 갱신
+        }
     }
+
+    // --- 로그 기록용 --- 
+    // --- 텍스트 로그 저장 함수 ---
+    public void LogAction(string action)
+    {
+        // 유니티가 보장하는 안전한 저장 경로 (기기마다 다름)
+        string path = Application.persistentDataPath + "/UserPlayLog.csv";
+        string logEntry = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "," + action + "\n";
+        System.IO.File.AppendAllText(path, logEntry);
+    }
+
+    
 }
