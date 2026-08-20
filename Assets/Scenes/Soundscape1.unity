@@ -2937,7 +2937,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 4
   m_MaskInteraction: 0
   m_Sprite: {fileID: -8774579561408971138, guid: 81563c10940a1d145a4397340d71c385, type: 3}
   m_Color: {r: 0.14509805, g: 0.2627451, b: 0.19215688, a: 1}
@@ -3148,7 +3148,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 5
   m_TargetDisplay: 0
 --- !u!1 &465797990
 GameObject:
@@ -3931,7 +3931,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 4
   m_MaskInteraction: 0
   m_Sprite: {fileID: -8774579561408971138, guid: 81563c10940a1d145a4397340d71c385, type: 3}
   m_Color: {r: 0.27058825, g: 0.41960788, b: 0.27058825, a: 1}
@@ -10045,7 +10045,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 4
   m_MaskInteraction: 0
   m_Sprite: {fileID: -8774579561408971138, guid: 81563c10940a1d145a4397340d71c385, type: 3}
   m_Color: {r: 0.5686275, g: 0.6784314, b: 0.32156864, a: 1}

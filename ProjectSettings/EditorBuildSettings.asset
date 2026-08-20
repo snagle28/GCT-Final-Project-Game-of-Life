@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Beginning Cutscene.unity
     guid: e49ece57f0e2f904e91151f2530e973c
   - enabled: 1
@@ -20,13 +20,13 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Instructions.unity
     guid: 558640b0bccdb1f478eba04916eb9bdd
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Intro Sound_R.unity
     guid: 197f4705d49b14f0497e325a1ddca3bf
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Soundscape1_R.unity
     guid: c4ef4a89bfb3c4bc784b57cde377eeb7
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Soundscape2_R.unity
     guid: 7b70f919883624d959a0fb001cef4672
   m_configObjects:
